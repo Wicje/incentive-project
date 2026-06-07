@@ -1,0 +1,6 @@
+{
+  "name": "Agency OS",
+  "description": "Frontend-only agency operating system integrating with Google Sheets and Cloudinary.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
