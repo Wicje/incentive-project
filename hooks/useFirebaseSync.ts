@@ -7,38 +7,45 @@ import { Project, Task, Log, Asset, Note, Invoice, Resource } from '@/types';
 export function useFirebaseSync() {
   useEffect(() => {
     const unsubProjects = onSnapshot(collection(db, 'projects'), (snap) => {
-      const projects = snap.docs.map(doc => doc.data() as Project);
-      useStore.setState({ projects });
+      const items = snap.docs.map(doc => doc.data() as Project);
+      const uniqueItems = Array.from(new Map(items.map(item => [item.id, item])).values());
+      useStore.setState({ projects: uniqueItems });
     });
 
     const unsubTasks = onSnapshot(collection(db, 'tasks'), (snap) => {
-      const tasks = snap.docs.map(doc => doc.data() as Task);
-      useStore.setState({ tasks });
+      const items = snap.docs.map(doc => doc.data() as Task);
+      const uniqueItems = Array.from(new Map(items.map(item => [item.id, item])).values());
+      useStore.setState({ tasks: uniqueItems });
     });
 
     const unsubLogs = onSnapshot(collection(db, 'logs'), (snap) => {
-      const logs = snap.docs.map(doc => doc.data() as Log);
-      useStore.setState({ logs });
+      const items = snap.docs.map(doc => doc.data() as Log);
+      const uniqueItems = Array.from(new Map(items.map(item => [item.id, item])).values());
+      useStore.setState({ logs: uniqueItems });
     });
 
     const unsubAssets = onSnapshot(collection(db, 'assets'), (snap) => {
       const items = snap.docs.map(doc => doc.data() as Asset);
-      useStore.setState({ assets: items });
+      const uniqueItems = Array.from(new Map(items.map(item => [item.id, item])).values());
+      useStore.setState({ assets: uniqueItems });
     });
 
     const unsubNotes = onSnapshot(collection(db, 'notes'), (snap) => {
       const items = snap.docs.map(doc => doc.data() as Note);
-      useStore.setState({ notes: items });
+      const uniqueItems = Array.from(new Map(items.map(item => [item.id, item])).values());
+      useStore.setState({ notes: uniqueItems });
     });
 
     const unsubInvoices = onSnapshot(collection(db, 'invoices'), (snap) => {
       const items = snap.docs.map(doc => doc.data() as Invoice);
-      useStore.setState({ invoices: items });
+      const uniqueItems = Array.from(new Map(items.map(item => [item.id, item])).values());
+      useStore.setState({ invoices: uniqueItems });
     });
 
     const unsubResources = onSnapshot(collection(db, 'resources'), (snap) => {
       const items = snap.docs.map(doc => doc.data() as Resource);
-      useStore.setState({ resources: items });
+      const uniqueItems = Array.from(new Map(items.map(item => [item.id, item])).values());
+      useStore.setState({ resources: uniqueItems });
     });
 
     return () => {

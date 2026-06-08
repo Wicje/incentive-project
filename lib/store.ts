@@ -77,7 +77,10 @@ export const useStore = create<AgencyState>()(
         // Try external API
         await api.syncProject(newProject);
 
-        set((state) => ({ projects: [...state.projects, newProject] }));
+        set((state) => {
+          if (state.projects.some(p => p.id === newProject.id)) return state;
+          return { projects: [...state.projects, newProject] };
+        });
         await get().logAction(newProject.id, 'Project Created', `Created project for ${newProject.client}`);
       },
 
@@ -106,7 +109,10 @@ export const useStore = create<AgencyState>()(
         
         await api.syncTask(newTask);
         
-        set((state) => ({ tasks: [...state.tasks, newTask] }));
+        set((state) => {
+          if (state.tasks.some(t => t.id === newTask.id)) return state;
+          return { tasks: [...state.tasks, newTask] };
+        });
         await get().logAction(newTask.projectId, 'Task Added', `Added task: ${newTask.title}`);
       },
 
@@ -132,7 +138,10 @@ export const useStore = create<AgencyState>()(
 
         await api.syncAsset(newAsset);
 
-        set((state) => ({ assets: [...state.assets, newAsset] }));
+        set((state) => {
+          if (state.assets.some(a => a.id === newAsset.id)) return state;
+          return { assets: [...state.assets, newAsset] };
+        });
         await get().logAction(projectId, 'Asset Uploaded', 'New asset added to project');
       },
 
@@ -144,7 +153,10 @@ export const useStore = create<AgencyState>()(
           updatedAt: new Date().toISOString(),
         };
         await api.syncNote(newNote);
-        set((state) => ({ notes: [newNote, ...state.notes] }));
+        set((state) => {
+          if (state.notes.some(n => n.id === newNote.id)) return state;
+          return { notes: [newNote, ...state.notes] };
+        });
       },
 
       updateNote: async (id, updates) => {
@@ -167,7 +179,10 @@ export const useStore = create<AgencyState>()(
           createdAt: new Date().toISOString(),
         };
         await api.syncInvoice(newInvoice);
-        set((state) => ({ invoices: [newInvoice, ...state.invoices] }));
+        set((state) => {
+          if (state.invoices.some(i => i.id === newInvoice.id)) return state;
+          return { invoices: [newInvoice, ...state.invoices] };
+        });
       },
 
       updateInvoice: async (id, updates) => {
@@ -185,7 +200,10 @@ export const useStore = create<AgencyState>()(
           createdAt: new Date().toISOString(),
         };
         await api.syncResource(newResource);
-        set((state) => ({ resources: [newResource, ...state.resources] }));
+        set((state) => {
+          if (state.resources.some(r => r.id === newResource.id)) return state;
+          return { resources: [newResource, ...state.resources] };
+        });
       },
 
       deleteResource: async (id) => {
@@ -208,7 +226,10 @@ export const useStore = create<AgencyState>()(
 
         await api.syncLog(newLog);
 
-        set((state) => ({ logs: [newLog, ...state.logs] }));
+        set((state) => {
+          if (state.logs.some(l => l.id === newLog.id)) return state;
+          return { logs: [newLog, ...state.logs] };
+        });
       },
     }),
     {
