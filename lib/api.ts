@@ -1,67 +1,37 @@
 import { Project, Task, Log } from '@/types';
-
-/**
- * Handles communication with Google Apps Script and Cloudinary.
- * Falls back to console warnings if ENV vars are absent (enabling mock mode).
- */
-
-const getAppsScriptUrl = () => process.env.NEXT_PUBLIC_APPS_SCRIPT_URL;
+import { db } from './firebase';
+import { doc, setDoc } from 'firebase/firestore';
 
 export async function syncProject(project: Project) {
-  const url = getAppsScriptUrl();
-  if (!url) {
-    console.warn('[Mock Sync] Project:', project.name);
-    return;
-  }
-  
   try {
-    await fetch(url, {
-      method: 'POST',
-      body: JSON.stringify({ action: 'sync_project', data: project }),
-      mode: 'no-cors' // Google Apps Script typically needs no-cors from frontend if deployed as Web App
-    });
+    await setDoc(doc(db, 'projects', project.id), project);
   } catch (err) {
-    console.error('Failed to sync project to Sheets:', err);
+    console.error('Failed to sync project to Firebase:', err);
   }
 }
 
 export async function syncTask(task: Task) {
-  const url = getAppsScriptUrl();
-  if (!url) {
-    console.warn('[Mock Sync] Task:', task.title);
-    return;
-  }
-  
   try {
-    await fetch(url, {
-      method: 'POST',
-      body: JSON.stringify({ action: 'sync_task', data: task }),
-      mode: 'no-cors'
-    });
+    await setDoc(doc(db, 'tasks', task.id), task);
   } catch (err) {
-    console.error('Failed to sync task to Sheets:', err);
+    console.error('Failed to sync task to Firebase:', err);
   }
 }
 
 export async function syncLog(log: Log) {
-  const url = getAppsScriptUrl();
-  if (!url) {
-    console.warn('[Mock Sync] Log:', log.action);
-    return;
-  }
-  
   try {
-    await fetch(url, {
-      method: 'POST',
-      body: JSON.stringify({ action: 'sync_log', data: log }),
-      mode: 'no-cors'
-    });
+    await setDoc(doc(db, 'logs', log.id), log);
   } catch (err) {
-    console.error('Failed to sync log to Sheets:', err);
+    console.error('Failed to sync log to Firebase:', err);
   }
 }
 
 export async function uploadToCloudinary(file: File): Promise<string> {
+  const MAX_FILE_SIZE = 20 * 1024 * 1024; // 20 MB limit
+  if (file.size > MAX_FILE_SIZE) {
+    throw new Error('File size exceeds the 20MB limit.');
+  }
+
   const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
   const uploadPreset = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET;
 

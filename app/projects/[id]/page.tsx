@@ -73,13 +73,13 @@ export default function ProjectDetail() {
   return (
     <div className="flex flex-col h-full bg-[#FAF9F6]">
       {/* Header */}
-      <header className="border-b border-stone-200/60 px-8 py-10 flex flex-col md:flex-row md:items-end justify-between gap-6 bg-[#FAF9F6] sticky top-0 z-10 shrink-0">
+      <header className="border-b border-stone-200/60 px-8 py-6 flex flex-col md:flex-row md:items-end justify-between gap-6 bg-zinc-50 sticky top-0 z-10 shrink-0">
         <div>
-          <Link href="/" className="inline-flex items-center text-[10px] uppercase tracking-widest font-bold text-stone-400 hover:text-stone-800 mb-6 transition-colors">
+          <Link href="/" className="inline-flex items-center text-[10px] uppercase tracking-widest font-bold text-stone-400 hover:text-stone-800 mb-4 transition-colors">
             <ArrowLeft className="w-3 h-3 mr-2" /> Back to Workspace
           </Link>
           <div className="flex items-center gap-4">
-            <h1 className="text-4xl md:text-5xl font-serif font-semibold tracking-tight text-stone-900">{project.name}</h1>
+            <h1 className="text-4xl md:text-5xl font-serif font-bold tracking-tight text-zinc-900">{project.name}</h1>
             <div className="relative">
               <button 
                 onClick={() => setIsStatusMenuOpen(!isStatusMenuOpen)}
@@ -107,10 +107,39 @@ export default function ProjectDetail() {
         </div>
         
         <div className="flex items-center gap-3">
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="border-stone-200 text-stone-600 hover:bg-stone-100"
+            onClick={async () => {
+              const url = window.location.origin + `/projects/${project.id}/client`;
+              const subject = `Project Update: ${project.name}`;
+              const body = `Hi ${project.client},\n\nYou can view the latest updates for your project here: ${url}\n\nBest,\nYour Agency`;
+              const encodedSubject = encodeURIComponent(subject);
+              const encodedBody = encodeURIComponent(body);
+              
+              const res = await fetch('/api/send', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  to: project.client, // This would normally be an email address if we captured it
+                  subject,
+                  text: body,
+                })
+              });
+              if (!res.ok) {
+                window.location.assign(`mailto:?subject=${encodedSubject}&body=${encodedBody}`);
+              } else {
+                alert('Project preview sent to client!');
+              }
+            }}
+          >
+            Email Client Link
+          </Button>
           <Link href={`/projects/${project.id}/client`} target="_blank">
-            <Button variant="outline" size="sm" className="border-stone-200 text-stone-600 hover:bg-stone-100">
+            <Button variant="default" size="sm" className="bg-stone-900 text-white hover:bg-stone-800">
               <Eye className="w-4 h-4 mr-2" />
-              Client Portal
+              Client Preview
             </Button>
           </Link>
         </div>
@@ -210,45 +239,65 @@ export default function ProjectDetail() {
               <div className="flex justify-between items-center bg-white p-6 rounded-2xl border border-dashed border-stone-300">
                 <div>
                   <h3 className="font-semibold text-stone-900 text-base mb-1">Files & Media</h3>
-                  <p className="text-sm text-stone-500">Image files are also synced automatically when dropped into the canvas.</p>
+                  <p className="text-sm text-stone-500">Click on any asset to insert it directly into the canvas.</p>
                 </div>
-                <div className="relative">
-                  <input 
-                    type="file" 
-                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                    accept="image/*"
-                    onChange={async (e) => {
-                      const file = e.target.files?.[0];
-                      if (file) {
-                        try {
-                          const { uploadToCloudinary } = await import('@/lib/api');
-                          const url = await uploadToCloudinary(file);
-                          await addAsset(project.id, url, 'image');
-                        } catch (err) {
-                          alert('Upload failed');
+                <div className="flex gap-4">
+                  <div className="relative">
+                    <input 
+                      type="file" 
+                      className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                      accept="image/*"
+                      onChange={async (e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          try {
+                            const { uploadToCloudinary } = await import('@/lib/api');
+                            const url = await uploadToCloudinary(file);
+                            await addAsset(project.id, url, 'image');
+                          } catch (err: any) {
+                            alert(err.message || 'Upload failed');
+                          }
                         }
-                      }
-                    }}
-                  />
-                  <Button variant="outline" className="border-stone-200 shadow-sm text-stone-700 hover:bg-stone-50">
-                    Upload File
-                  </Button>
+                      }}
+                    />
+                    <Button variant="outline" className="border-stone-200 shadow-sm text-stone-700 hover:bg-stone-50">
+                      Upload File
+                    </Button>
+                  </div>
                 </div>
               </div>
 
-              {projectAssets.length === 0 ? (
+              {assets.length === 0 ? (
                 <div className="text-center py-24 bg-white/50 rounded-3xl border border-dashed border-stone-200">
                   <FileImage className="w-10 h-10 text-stone-300 mx-auto mb-4" />
-                  <p className="text-stone-500 font-medium">No assets uploaded yet</p>
+                  <p className="text-stone-500 font-medium">No assets available. Upload an image to start using it.</p>
                 </div>
               ) : (
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
-                  {projectAssets.map(asset => (
-                    <a key={asset.id} href={asset.url} target="_blank" rel="noopener noreferrer" className="group rounded-2xl overflow-hidden border border-stone-200 aspect-square block bg-stone-100 relative shadow-sm hover:shadow-md transition-shadow cursor-zoom-in">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src={asset.url} alt="Asset" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
-                    </a>
-                  ))}
+                <div>
+                  <h4 className="text-sm font-semibold tracking-wider uppercase text-stone-400 mb-4 px-1">Global & Project Assets</h4>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-6">
+                    {assets.map(asset => (
+                      <div key={asset.id} className="relative group">
+                        <button 
+                          onClick={() => {
+                            const imgHtml = `<img src="${asset.url}" alt="Asset" />`;
+                            updateProjectCanvas(project.id, (project.canvasContent || '') + imgHtml);
+                            alert('Image added to canvas!');
+                          }}
+                          className="w-full text-left rounded-2xl overflow-hidden border border-stone-200 aspect-square block bg-stone-100 shadow-sm hover:shadow-md transition-shadow focus:outline-none focus:ring-2 focus:ring-stone-400"
+                          title="Click to insert into Canvas"
+                        >
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img src={asset.url} alt="Asset" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+                          <div className="absolute inset-0 bg-stone-900/0 group-hover:bg-stone-900/10 transition-colors flex items-center justify-center">
+                            <span className="opacity-0 group-hover:opacity-100 bg-white/90 text-stone-800 text-xs font-semibold px-2 py-1 rounded shadow-sm">
+                              Add to Canvas
+                            </span>
+                          </div>
+                        </button>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               )}
             </div>

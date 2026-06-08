@@ -12,6 +12,7 @@ export default function InvoicePage() {
   const router = useRouter();
   const { invoices, identity, updateInvoice } = useStore();
   const [mounted, setMounted] = useState(false);
+  const [isSending, setIsSending] = useState(false);
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -25,11 +26,37 @@ export default function InvoicePage() {
 
   const invoiceIdStr = `INV-${invoice.id.slice(0, 8).toUpperCase()}`;
 
-  const sendEmail = () => {
-    updateInvoice(invoice.id, { status: 'sent' });
-    const subject = encodeURIComponent(`Invoice ${invoiceIdStr} from ${identity?.name || 'Agency'}`);
-    const body = encodeURIComponent(`Hi ${invoice.clientName},\n\nPlease find your invoice ${invoiceIdStr} attached/linked here for the amount of $${invoice.amount.toFixed(2)}.\n\nThank you,\n${identity?.name || 'Agency'}`);
-    window.location.assign(`mailto:${invoice.clientEmail}?subject=${subject}&body=${body}`);
+  const sendEmail = async () => {
+    setIsSending(true);
+    try {
+      const subject = `Invoice ${invoiceIdStr} from ${identity?.name || 'Agency'}`;
+      const body = `Hi ${invoice.clientName},\n\nPlease find your invoice ${invoiceIdStr} linked here for the amount of $${invoice.amount.toFixed(2)}.\n\nThank you,\n${identity?.name || 'Agency'}`;
+      
+      const res = await fetch('/api/send', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          to: invoice.clientEmail,
+          subject,
+          text: body,
+        }),
+      });
+
+      if (!res.ok) {
+        // Fallback to mailto if API fails (e.g. no API key)
+        const encodedSubject = encodeURIComponent(subject);
+        const encodedBody = encodeURIComponent(body);
+        window.location.assign(`mailto:${invoice.clientEmail}?subject=${encodedSubject}&body=${encodedBody}`);
+      } else {
+        alert('Invoice sent to client!');
+      }
+      updateInvoice(invoice.id, { status: 'sent' });
+    } catch (e) {
+      console.error(e);
+      alert('Failed to send email.');
+    } finally {
+      setIsSending(false);
+    }
   };
 
   const taxAmount = invoice.amount * 0.15; // 15% tax example
@@ -174,9 +201,9 @@ export default function InvoicePage() {
           </button>
         </div>
 
-        <Button onClick={sendEmail} variant="default" className="bg-[#FEFCFA] hover:bg-[#EAE1D3] text-[#1B110F] font-semibold rounded-full px-6 flex items-center gap-2">
+        <Button onClick={sendEmail} disabled={isSending} variant="default" className="bg-[#FEFCFA] hover:bg-[#EAE1D3] text-[#1B110F] font-semibold rounded-full px-6 flex items-center gap-2">
           <Send className="w-4 h-4" />
-          Send Email
+          {isSending ? 'Sending...' : 'Send Email'}
         </Button>
       </div>
     </div>

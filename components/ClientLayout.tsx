@@ -4,9 +4,11 @@ import Sidebar from '@/components/Sidebar';
 import { useStore } from '@/lib/store';
 import { Menu } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useFirebaseSync } from '@/hooks/useFirebaseSync';
 
 export default function ClientLayout({ children }: { children: React.ReactNode }) {
   const { sidebarOpen, toggleSidebar } = useStore();
+  useFirebaseSync();
 
   return (
     <div className="flex h-screen overflow-hidden w-full">
