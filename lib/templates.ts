@@ -76,8 +76,151 @@ export const MOODBOARD_TEMPLATES = [
 
 export const PROJECT_TEMPLATES: ProjectTemplate[] = [
   {
+    id: 'logo-architecture',
+    name: '15-Step Logo Architecture',
+    description: '15-step logo architecture template.',
+    clientType: 'Any',
+    defaultStages: [
+      { id: 'research', label: 'Research & Strategy' },
+      { id: 'concepts', label: 'Concepts & Sketching' },
+      { id: 'refinement', label: 'Design & Refinement' },
+      { id: 'delivery', label: 'Presentation & Delivery' }
+    ],
+    defaultTasks: [
+      { title: 'Client Intake & Brief', stageId: 'research' },
+      { title: 'Competitor Research', stageId: 'research' },
+      { title: 'Target Audience Profile', stageId: 'research' },
+      { title: 'Brand Positioning Scales', stageId: 'research' },
+      { title: 'Style Direction — Mood Boards', stageId: 'concepts' },
+      { title: 'Client Direction Lockup', stageId: 'concepts' },
+      { title: 'Word Mapping & Brainstorm', stageId: 'concepts' },
+      { title: 'Thumbnail Sketching', stageId: 'concepts' },
+      { title: 'Vectorize Concepts', stageId: 'refinement' },
+      { title: 'Typography Pairings Study', stageId: 'refinement' },
+      { title: 'Color Palette System', stageId: 'refinement' },
+      { title: 'Logo Matrix Variations', stageId: 'refinement' },
+      { title: 'Clear Space Spacing Rules', stageId: 'refinement' },
+      { title: 'Concept Deck Presentation', stageId: 'delivery' },
+      { title: 'Final File Delivery Package', stageId: 'delivery' }
+    ],
+    canvasTemplate: `
+      <h2>1. Client Intake & Brief</h2>
+      <p><br></p>
+      <h2>2. Competitor Research</h2>
+      <p><br></p>
+      <h2>3. Target Audience Profile</h2>
+      <p><br></p>
+      <h2>4. Brand Positioning Scales</h2>
+      <p><br></p>
+      <h2>5. Style Direction — Mood Boards</h2>
+      <p><br></p>
+      <h2>6. Client Direction Lockup</h2>
+      <p><br></p>
+      <h2>7. Word Mapping & Brainstorm</h2>
+      <p><br></p>
+      <h2>8. Thumbnail Sketching</h2>
+      <p><br></p>
+      <h2>9. Vectorize Concepts</h2>
+      <p><br></p>
+      <h2>10. Typography Pairings Study</h2>
+      <p><br></p>
+      <h2>11. Color Palette System</h2>
+      <p><br></p>
+      <h2>12. Logo Matrix Variations</h2>
+      <p><br></p>
+      <h2>13. Clear Space Spacing Rules</h2>
+      <p><br></p>
+      <h2>14. Concept Deck Presentation</h2>
+      <p><br></p>
+      <h2>15. Final File Delivery Package</h2>
+      <p><br></p>
+    `
+  },
+  {
+    id: 'full-branding',
+    name: '22-Step Full Branding',
+    description: 'Complete 22-step brand strategy and identity architecture.',
+    clientType: 'Any',
+    defaultStages: [
+      { id: 'research', label: 'Research & Strategy' },
+      { id: 'concepts', label: 'Concepts & Sketching' },
+      { id: 'refinement', label: 'Design & Refinement' },
+      { id: 'expansion', label: 'System Expansion' },
+      { id: 'delivery', label: 'Presentation & Delivery' }
+    ],
+    defaultTasks: [
+      { title: 'Client Intake & Brief', stageId: 'research' },
+      { title: 'Competitor Research', stageId: 'research' },
+      { title: 'Target Audience Profile', stageId: 'research' },
+      { title: 'Brand Positioning Scales', stageId: 'research' },
+      { title: 'Style Direction — Mood Boards', stageId: 'concepts' },
+      { title: 'Client Direction Lockup', stageId: 'concepts' },
+      { title: 'Word Mapping & Brainstorm', stageId: 'concepts' },
+      { title: 'Thumbnail Sketching', stageId: 'concepts' },
+      { title: 'Vectorize Concepts', stageId: 'refinement' },
+      { title: 'Typography Pairings Study', stageId: 'refinement' },
+      { title: 'Color Palette System', stageId: 'refinement' },
+      { title: 'Logo Matrix Variations', stageId: 'refinement' },
+      { title: 'Clear Space Spacing Rules', stageId: 'refinement' },
+      { title: 'Brand Language & Voice', stageId: 'expansion' },
+      { title: 'Photo Style Rules', stageId: 'expansion' },
+      { title: 'Supporting Brand Assets', stageId: 'expansion' },
+      { title: 'Concept Deck Presentation', stageId: 'delivery' },
+      { title: 'Full Identity Presentation', stageId: 'delivery' },
+      { title: 'Branding Guidelines Manual', stageId: 'delivery' },
+      { title: 'Collateral Applications', stageId: 'delivery' },
+      { title: 'Final System Delivery', stageId: 'delivery' }
+    ],
+    canvasTemplate: `
+      <h2>1. Client Intake & Brief</h2>
+      <p><br></p>
+      <h2>2. Competitor Research</h2>
+      <p><br></p>
+      <h2>3. Target Audience Profile</h2>
+      <p><br></p>
+      <h2>4. Brand Positioning Scales</h2>
+      <p><br></p>
+      <h2>5. Style Direction — Mood Boards</h2>
+      <p><br></p>
+      <h2>6. Client Direction Lockup</h2>
+      <p><br></p>
+      <h2>7. Word Mapping & Brainstorm</h2>
+      <p><br></p>
+      <h2>8. Thumbnail Sketching</h2>
+      <p><br></p>
+      <h2>9. Vectorize Concepts</h2>
+      <p><br></p>
+      <h2>10. Typography Pairings Study</h2>
+      <p><br></p>
+      <h2>11. Color Palette System</h2>
+      <p><br></p>
+      <h2>12. Logo Matrix Variations</h2>
+      <p><br></p>
+      <h2>13. Clear Space Spacing Rules</h2>
+      <p><br></p>
+      <h2>14. Concept Deck Presentation</h2>
+      <p><br></p>
+      <h2>15. Final File Delivery Package</h2>
+      <p><br></p>
+      <h2>16. Brand Language & Voice</h2>
+      <p><br></p>
+      <h2>17. Photo Style Rules</h2>
+      <p><br></p>
+      <h2>18. Supporting Brand Assets</h2>
+      <p><br></p>
+      <h2>19. Full Identity Presentation</h2>
+      <p><br></p>
+      <h2>20. Branding Guidelines Manual</h2>
+      <p><br></p>
+      <h2>21. Collateral Applications</h2>
+      <p><br></p>
+      <h2>22. Final System Delivery</h2>
+      <p><br></p>
+    `
+  },
+  {
     id: 'branding-package',
-    name: 'Brand Strategy & Identity',
+    name: 'Brand Strategy & Identity (Original)',
     description: 'Full brand strategy, visual identity, and guidelines.',
     clientType: 'Startup / SMB',
     defaultStages: [

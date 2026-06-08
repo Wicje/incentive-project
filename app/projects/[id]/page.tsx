@@ -112,36 +112,54 @@ export default function ProjectDetail() {
             size="sm" 
             className="border-stone-200 text-stone-600 hover:bg-stone-100"
             onClick={async () => {
-              const url = window.location.origin + `/projects/${project.id}/client`;
-              const subject = `Project Update: ${project.name}`;
-              const body = `Hi ${project.client},\n\nYou can view the latest updates for your project here: ${url}\n\nBest,\nYour Agency`;
-              const encodedSubject = encodeURIComponent(subject);
-              const encodedBody = encodeURIComponent(body);
-              
-              const res = await fetch('/api/send', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                  to: project.client, // This would normally be an email address if we captured it
-                  subject,
-                  text: body,
-                })
-              });
-              if (!res.ok) {
-                window.location.assign(`mailto:?subject=${encodedSubject}&body=${encodedBody}`);
-              } else {
-                alert('Project preview sent to client!');
-              }
+              const completedTasks = projectTasks.filter(t => t.status === 'done');
+              const pendingTasks = projectTasks.filter(t => t.status !== 'done');
+              const report = `Project Update: ${project.name}
+Client: ${project.client}
+Status: ${project.status.toUpperCase()}
+
+COMPLETED RECENTLY:
+${completedTasks.length > 0 ? completedTasks.map(t => '✓ ' + t.title).join('\\n') : 'No completed tasks yet.'}
+
+UPCOMING:
+${pendingTasks.length > 0 ? pendingTasks.slice(0, 5).map(t => '☐ ' + t.title).join('\\n') : 'No pending tasks.'}
+
+Please let me know if you have any questions!`;
+
+              await navigator.clipboard.writeText(report);
+              alert('Status Report copied to clipboard. You can paste this into an email to your client.');
             }}
           >
-            Email Client Link
+            Copy Status Report
           </Button>
-          <Link href={`/projects/${project.id}/client`} target="_blank">
-            <Button variant="default" size="sm" className="bg-stone-900 text-white hover:bg-stone-800">
-              <Eye className="w-4 h-4 mr-2" />
-              Client Preview
-            </Button>
-          </Link>
+          <Button 
+            variant="default" 
+            size="sm" 
+            className="bg-stone-900 text-white hover:bg-stone-800"
+            onClick={() => {
+              const url = window.location.origin;
+              const subject = `Project Update: ${project.name}`;
+              const completedTasks = projectTasks.filter(t => t.status === 'done');
+              const pendingTasks = projectTasks.filter(t => t.status !== 'done');
+              const body = `Hi ${project.client},
+
+Here is the latest update for your project:
+
+Status: ${project.status.toUpperCase()}
+
+COMPLETED:
+${completedTasks.length > 0 ? completedTasks.map(t => '✓ ' + t.title).join('%0D%0A') : 'None recently.'}
+
+UPCOMING:
+${pendingTasks.length > 0 ? pendingTasks.slice(0, 5).map(t => '☐ ' + t.title).join('%0D%0A') : 'None.'}
+
+Best,
+Your Agency`;
+              window.location.assign(`mailto:?subject=${encodeURIComponent(subject)}&body=${body}`);
+            }}
+          >
+            Draft Email Update
+          </Button>
         </div>
       </header>
 

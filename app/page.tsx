@@ -24,6 +24,7 @@ export default function Dashboard() {
     if (!newProject.name || !newProject.client) return;
 
     let canvasTemplate = '';
+    let defaultTasks: any[] = [];
     if (newProject.templateId) {
       const selected = MOODBOARD_TEMPLATES.find(t => t.id === newProject.templateId) || PROJECT_TEMPLATES.find(t => t.id === newProject.templateId);
       if (selected && 'content' in selected) {
@@ -31,9 +32,14 @@ export default function Dashboard() {
       } else if (selected && 'canvasTemplate' in selected) {
         canvasTemplate = selected.canvasTemplate;
       }
+
+      const projectSelected = PROJECT_TEMPLATES.find(t => t.id === newProject.templateId);
+      if (projectSelected && projectSelected.defaultTasks) {
+        defaultTasks = projectSelected.defaultTasks;
+      }
     }
 
-    await addProject({
+    const newProjectId = await addProject({
       name: newProject.name,
       client: newProject.client,
       status: 'planning',
@@ -43,6 +49,19 @@ export default function Dashboard() {
       ownerEmail: identity.email,
       canvasContent: canvasTemplate
     });
+    
+    // Add default tasks
+    if (newProjectId && defaultTasks.length > 0) {
+      for (const t of defaultTasks) {
+        await addTask({
+          projectId: newProjectId,
+          title: t.title,
+          stage: t.stageId as any,
+          status: 'todo',
+          dueDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString(),
+        });
+      }
+    }
     
     setNewProject({ name: '', client: '', deadline: '', templateId: '' });
     setIsCreating(false);

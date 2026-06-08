@@ -19,7 +19,7 @@ interface AgencyState {
 
   
   // Projects
-  addProject: (project: Omit<Project, 'id' | 'createdAt'>) => Promise<void>;
+  addProject: (project: Omit<Project, 'id' | 'createdAt'>) => Promise<string>;
   updateProject: (id: string, updates: Partial<Project>) => Promise<void>;
   updateProjectCanvas: (id: string, content: string) => Promise<void>;
   
@@ -66,7 +66,7 @@ export const useStore = create<AgencyState>()(
 
       addProject: async (projectData) => {
         const { identity } = get();
-        if (!identity) return;
+        if (!identity) return "";
 
         const newProject: Project = {
           ...projectData,
@@ -82,6 +82,7 @@ export const useStore = create<AgencyState>()(
           return { projects: [...state.projects, newProject] };
         });
         await get().logAction(newProject.id, 'Project Created', `Created project for ${newProject.client}`);
+        return newProject.id;
       },
 
       updateProject: async (id, updates) => {
