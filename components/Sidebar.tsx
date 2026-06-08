@@ -3,13 +3,14 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
-import { LayoutDashboard, Target, Activity, Settings, Zap } from 'lucide-react';
+import { LayoutDashboard, Target, Activity, Settings, Zap, Calendar, Command, Folder, FileText, PanelLeftClose } from 'lucide-react';
 import { useStore } from '@/lib/store';
 import { useEffect, useState } from 'react';
 
 export default function Sidebar({ className }: { className?: string }) {
   const pathname = usePathname();
   const identity = useStore((state) => state.identity);
+  const toggleSidebar = useStore((state) => state.toggleSidebar);
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -18,18 +19,26 @@ export default function Sidebar({ className }: { className?: string }) {
   }, []);
 
   const navItems = [
-    { name: 'Dashboard', href: '/', icon: LayoutDashboard },
+    { name: 'Workspace', href: '/', icon: LayoutDashboard },
+    { name: 'Inbox', href: '/inbox', icon: Command },
+    { name: 'Pipeline', href: '/pipeline', icon: Folder },
+    { name: 'Calendar', href: '/calendar', icon: Calendar },
+    { name: 'Finance', href: '/finance', icon: FileText },
+    { name: 'Resources', href: '/resources', icon: Activity },
   ];
 
   return (
-    <aside className={cn(className)}>
-      <div className="p-6 pb-2 mb-4">
+    <aside className={cn(className, "relative")}>
+      <div className="p-6 pb-2 mb-4 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <div className="w-8 h-8 bg-stone-900 rounded flex items-center justify-center text-[#FAF9F6]">
             <Zap className="w-4 h-4 fill-current" />
           </div>
           <span className="font-serif font-semibold tracking-tight text-xl text-stone-900">Agency OS</span>
         </div>
+        <button onClick={toggleSidebar} className="p-1.5 text-stone-400 hover:bg-stone-200/50 hover:text-stone-700 rounded-md transition-colors hidden md:block">
+          <PanelLeftClose className="w-4 h-4" />
+        </button>
       </div>
 
       <div className="px-4 mb-2">

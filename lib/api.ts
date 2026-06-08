@@ -66,8 +66,13 @@ export async function uploadToCloudinary(file: File): Promise<string> {
   const uploadPreset = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET;
 
   if (!cloudName || !uploadPreset) {
-    console.warn('[Mock Sync] Cloudinary. Resolving a placeholder image.');
-    return new Promise(resolve => setTimeout(() => resolve('https://picsum.photos/800/600?' + Math.random()), 1000));
+    console.warn('[Mock Sync] Cloudinary. Resolving file as data URL.');
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onloadend = () => resolve(reader.result as string);
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
   }
 
   const formData = new FormData();

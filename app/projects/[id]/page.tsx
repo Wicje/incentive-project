@@ -2,7 +2,7 @@
 
 import { useStore } from '@/lib/store';
 import { useParams } from 'next/navigation';
-import { useState, use } from 'react';
+import { useState, use, useEffect } from 'react';
 import Link from 'next/link';
 import { ArrowLeft, CheckCircle2, Circle, Clock, MoreVertical, Eye, FileImage } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -12,31 +12,50 @@ import { TaskStage, TaskStatus } from '@/types';
 export default function ProjectDetail() {
   const { id } = useParams() as { id: string };
   const { projects, tasks, addTask, updateTask, updateProjectCanvas, addAsset, assets } = useStore();
+  const [mounted, setMounted] = useState(false);
   
   const project = projects.find(p => p.id === id);
   const projectTasks = tasks.filter(t => t.projectId === id);
   const projectAssets = assets.filter(a => a.projectId === id);
 
   const [newTaskTitle, setNewTaskTitle] = useState('');
-  const [activeTab, setActiveTab] = useState<'board' | 'canvas' | 'assets'>('canvas');
+  const [activeTab, setActiveTab] = useState<'canvas' | 'board' | 'assets'>('canvas');
+  const [isStatusMenuOpen, setIsStatusMenuOpen] = useState(false);
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setMounted(true);
+  }, []);
+
+  if (!mounted) return <div className="p-12 text-stone-500 font-serif">Loading...</div>;
 
   if (!project) {
     return <div className="p-12 text-stone-500 font-serif">Project not found</div>;
   }
 
-  const handleAddTask = async (e: React.FormEvent, stage: TaskStage) => {
+  const handleUpdateStatus = (newStatus: 'planning' | 'in-progress' | 'review' | 'completed') => {
+    useStore.getState().updateProject(project.id, { status: newStatus });
+    setIsStatusMenuOpen(false);
+  };
+
+  const handleAddTask = async (e: React.FormEvent<HTMLFormElement>, stage: TaskStage) => {
     e.preventDefault();
-    if (!newTaskTitle.trim()) return;
+    const formData = new FormData(e.currentTarget);
+    const title = formData.get('title') as string;
+    
+    if (!title || !title.trim()) return;
     
     await addTask({
       projectId: project.id,
-      title: newTaskTitle.trim(),
+      title: title.trim(),
       stage,
       status: 'todo',
       // eslint-disable-next-line react-hooks/purity
       dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString()
     });
-    setNewTaskTitle('');
+    
+    // Reset the input specifically for this form
+    e.currentTarget.reset();
   };
 
   const toggleTaskStatus = async (taskId: string, currentStatus: TaskStatus) => {
@@ -61,9 +80,28 @@ export default function ProjectDetail() {
           </Link>
           <div className="flex items-center gap-4">
             <h1 className="text-4xl md:text-5xl font-serif font-semibold tracking-tight text-stone-900">{project.name}</h1>
-            <span className="text-[10px] uppercase tracking-widest font-bold px-2.5 py-1 bg-stone-100 text-stone-600 rounded border border-stone-200">
-              {project.status.replace('-', ' ')}
-            </span>
+            <div className="relative">
+              <button 
+                onClick={() => setIsStatusMenuOpen(!isStatusMenuOpen)}
+                className="text-[10px] uppercase tracking-widest font-bold px-2.5 py-1 bg-stone-100 text-stone-600 rounded border border-stone-200 hover:bg-stone-200 transition-colors flex items-center gap-1 cursor-pointer"
+              >
+                {project.status.replace('-', ' ')}
+                <MoreVertical className="w-3 h-3 -mr-1" />
+              </button>
+              {isStatusMenuOpen && (
+                <div className="absolute top-full left-0 mt-2 w-40 bg-white border border-stone-200 rounded-lg shadow-lg py-1 z-50">
+                  {['planning', 'in-progress', 'review', 'completed'].map((s) => (
+                    <button
+                      key={s}
+                      className={`w-full text-left px-4 py-2 text-xs uppercase tracking-wider font-bold hover:bg-stone-50 ${project.status === s ? 'text-stone-900 bg-stone-50/50' : 'text-stone-500'}`}
+                      onClick={() => handleUpdateStatus(s as any)}
+                    >
+                      {s.replace('-', ' ')}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
           <p className="text-stone-500 mt-2 tracking-wide font-medium">Prepared for <span className="text-stone-900 font-bold">{project.client}</span></p>
         </div>
@@ -154,14 +192,9 @@ export default function ProjectDetail() {
                       >
                         <input 
                           type="text" 
+                          name="title"
                           placeholder="Add task..." 
                           className="w-full bg-white/80 text-sm border border-stone-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-1 focus:ring-stone-400 focus:border-stone-400 shadow-sm transition-all text-stone-700 placeholder:text-stone-400"
-                          onKeyDown={(e) => {
-                            if (e.key === 'Enter' && e.currentTarget.value) {
-                              setNewTaskTitle(e.currentTarget.value);
-                            }
-                          }}
-                          onChange={(e) => setNewTaskTitle(e.target.value)}
                         />
                       </form>
                     </div>
@@ -176,8 +209,8 @@ export default function ProjectDetail() {
             <div className="space-y-8">
               <div className="flex justify-between items-center bg-white p-6 rounded-2xl border border-dashed border-stone-300">
                 <div>
-                  <h3 className="font-semibold text-stone-900 text-base mb-1">Asset Library</h3>
-                  <p className="text-sm text-stone-500">Assets are also synced automatically when dropped into the canvas.</p>
+                  <h3 className="font-semibold text-stone-900 text-base mb-1">Files & Media</h3>
+                  <p className="text-sm text-stone-500">Image files are also synced automatically when dropped into the canvas.</p>
                 </div>
                 <div className="relative">
                   <input 

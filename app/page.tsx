@@ -8,18 +8,30 @@ import { Button } from '@/components/ui/button';
 import { useState } from 'react';
 import { Input } from '@/components/ui/input';
 
+import { PROJECT_TEMPLATES, MOODBOARD_TEMPLATES } from '@/lib/templates';
+
 export default function Dashboard() {
   const { projects, logs, tasks, identity, addProject, addTask } = useStore();
   const [isCreating, setIsCreating] = useState(false);
   const [isCreatingTask, setIsCreatingTask] = useState(false);
   const [newTask, setNewTask] = useState({ title: '', projectId: '' });
-  const [newProject, setNewProject] = useState({ name: '', client: '', deadline: '' });
+  const [newProject, setNewProject] = useState({ name: '', client: '', deadline: '', templateId: '' });
 
   if (!identity) return null;
 
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newProject.name || !newProject.client) return;
+
+    let canvasTemplate = '';
+    if (newProject.templateId) {
+      const selected = MOODBOARD_TEMPLATES.find(t => t.id === newProject.templateId) || PROJECT_TEMPLATES.find(t => t.id === newProject.templateId);
+      if (selected && 'content' in selected) {
+        canvasTemplate = selected.content;
+      } else if (selected && 'canvasTemplate' in selected) {
+        canvasTemplate = selected.canvasTemplate;
+      }
+    }
 
     await addProject({
       name: newProject.name,
@@ -29,9 +41,10 @@ export default function Dashboard() {
       deadline: newProject.deadline || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
       ownerName: identity.name,
       ownerEmail: identity.email,
+      canvasContent: canvasTemplate
     });
     
-    setNewProject({ name: '', client: '', deadline: '' });
+    setNewProject({ name: '', client: '', deadline: '', templateId: '' });
     setIsCreating(false);
   };
 
@@ -63,44 +76,41 @@ export default function Dashboard() {
         </div>
       </header>
 
-      {/* Quick Actions */}
-      <section>
-        <h2 className="text-sm font-semibold tracking-wider uppercase text-stone-400 mb-4 px-1">Quick Actions</h2>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <button 
-            onClick={() => setIsCreating(!isCreating)}
-            className="flex items-center gap-3 p-4 bg-white border border-stone-200 rounded-xl hover:bg-stone-50 transition-colors shadow-sm text-left group"
-          >
-            <div className="bg-stone-100 p-2 rounded group-hover:bg-white transition-colors border border-transparent group-hover:border-stone-200">
-              <Plus className="w-4 h-4 text-stone-700" />
-            </div>
-            <span className="font-medium text-stone-700 text-sm">New Project</span>
-          </button>
-          
-          <button 
-            onClick={() => { setIsCreatingTask(!isCreatingTask); setIsCreating(false); }}
-            className="flex items-center gap-3 p-4 bg-white border border-stone-200 rounded-xl hover:bg-stone-50 transition-colors shadow-sm text-left group"
-          >
-            <div className="bg-stone-100 p-2 rounded group-hover:bg-white transition-colors border border-transparent group-hover:border-stone-200">
-              <CheckCircle2 className="w-4 h-4 text-stone-700" />
-            </div>
-            <span className="font-medium text-stone-700 text-sm">New Task</span>
-          </button>
-          
-          <button className="flex items-center gap-3 p-4 bg-white border border-stone-200 rounded-xl hover:bg-stone-50 transition-colors shadow-sm text-left group cursor-not-allowed opacity-70">
-            <div className="bg-stone-100 p-2 rounded border border-transparent">
-              <FileText className="w-4 h-4 text-stone-700" />
-            </div>
-            <span className="font-medium text-stone-700 text-sm">New Resources</span>
-          </button>
-          
-          <button className="flex items-center gap-3 p-4 bg-white border border-stone-200 rounded-xl hover:bg-stone-50 transition-colors shadow-sm text-left group cursor-not-allowed opacity-70">
-            <div className="bg-stone-100 p-2 rounded border border-transparent">
-              <Command className="w-4 h-4 text-stone-700" />
-            </div>
-            <span className="font-medium text-stone-700 text-sm">Quick Draft</span>
-          </button>
-        </div>
+      {/* Navigation / Domains Bento Grid */}
+      <section className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        {[
+          { name: 'Inbox & Ideas', icon: Command, color: 'bg-stone-100 text-stone-700', href: '/inbox' },
+          { name: 'Client Pipeline', icon: Folder, color: 'bg-stone-100 text-stone-700', href: '/pipeline' },
+          { name: 'Finance & Invoices', icon: FileText, color: 'bg-stone-100 text-stone-700', href: '/finance' },
+          { name: 'Resource Library', icon: Activity, color: 'bg-stone-100 text-stone-700', href: '/resources' },
+        ].map((domain, i) => (
+          <Link href={domain.href} key={i}>
+            <button className="w-full flex flex-col items-start gap-4 p-5 bg-white border border-stone-200 rounded-2xl hover:bg-stone-50 transition-colors shadow-sm text-left group h-full">
+              <div className={`p-2.5 rounded-lg ${domain.color} group-hover:scale-105 transition-transform`}>
+                <domain.icon className="w-5 h-5" />
+              </div>
+              <span className="font-semibold text-stone-800 text-sm tracking-wide">{domain.name}</span>
+            </button>
+          </Link>
+        ))}
+      </section>
+
+      {/* Action Bar */}
+      <section className="flex items-center gap-3 pb-2">
+        <button 
+          onClick={() => setIsCreating(!isCreating)}
+          className="flex items-center gap-2 px-4 py-2 bg-stone-900 text-white rounded-lg hover:bg-stone-800 transition-colors shadow-sm text-sm font-medium"
+        >
+          <Plus className="w-4 h-4" />
+          New Project
+        </button>
+        <button 
+          onClick={() => { setIsCreatingTask(!isCreatingTask); setIsCreating(false); }}
+          className="flex items-center gap-2 px-4 py-2 bg-white text-stone-700 border border-stone-200 rounded-lg hover:bg-stone-50 transition-colors shadow-sm text-sm font-medium"
+        >
+          <CheckCircle2 className="w-4 h-4 text-stone-400" />
+          Add Task
+        </button>
       </section>
 
       {isCreating && (
@@ -109,7 +119,7 @@ export default function Dashboard() {
             <h3 className="font-serif text-2xl font-semibold text-stone-800">Initiate Project</h3>
             <Button variant="ghost" size="sm" onClick={() => setIsCreating(false)}>Cancel</Button>
           </div>
-          <form onSubmit={handleCreate} className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <form onSubmit={handleCreate} className="grid grid-cols-1 md:grid-cols-4 gap-6">
             <div className="space-y-2">
               <label className="text-xs font-semibold uppercase tracking-wider text-stone-500">Project Name</label>
               <Input 
@@ -131,6 +141,22 @@ export default function Dashboard() {
               />
             </div>
             <div className="space-y-2">
+              <label className="text-xs font-semibold uppercase tracking-wider text-stone-500">Template</label>
+              <select 
+                value={newProject.templateId}
+                onChange={e => setNewProject({...newProject, templateId: e.target.value})}
+                className="flex h-11 w-full rounded-md border border-stone-200 bg-stone-50 px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-stone-400 disabled:cursor-not-allowed disabled:opacity-50 text-stone-900"
+              >
+                <option value="">Blank Workspace</option>
+                <optgroup label="Agency">
+                  {PROJECT_TEMPLATES.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
+                </optgroup>
+                <optgroup label="Moodboards">
+                  {MOODBOARD_TEMPLATES.map(t => <option key={t.id} value={t.id}>{t.title}</option>)}
+                </optgroup>
+              </select>
+            </div>
+            <div className="space-y-2">
               <label className="text-xs font-semibold uppercase tracking-wider text-stone-500">Expected Deadline</label>
               <Input 
                 type="date"
@@ -139,9 +165,12 @@ export default function Dashboard() {
                 className="bg-stone-50 border-stone-200 h-11"
               />
             </div>
-            <div className="md:col-span-3 pt-2">
-              <Button type="submit" className="bg-stone-900 text-white w-full md:w-auto hover:bg-stone-800">
+            <div className="md:col-span-4 pt-2">
+              <Button type="submit" className="bg-stone-900 text-white w-full md:w-auto hover:bg-stone-800 border-none transition-colors hidden md:block">
                 Create Workspace
+              </Button>
+              <Button type="submit" className="bg-stone-900 text-white w-full md:hidden">
+                Create
               </Button>
             </div>
           </form>

@@ -46,3 +46,38 @@ export interface Asset {
   type: 'image' | 'video' | 'document';
   createdAt: string;
 }
+
+export interface Note {
+  id: string;
+  title: string;
+  content: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface InvoiceItem {
+  id: string;
+  description: string;
+  quantity: number;
+  rate: number;
+}
+
+export interface Invoice {
+  id: string;
+  projectId: string; // can be empty for standalone
+  clientName: string;
+  clientEmail: string;
+  amount: number;
+  status: 'draft' | 'sent' | 'paid';
+  dueDate: string;
+  items: InvoiceItem[];
+  createdAt: string;
+}
+
+export interface Resource {
+  id: string;
+  title: string;
+  url: string;
+  category: string;
+  createdAt: string;
+}

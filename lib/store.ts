@@ -1,16 +1,22 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { Identity, Project, Task, Log, Asset } from '@/types';
+import { Identity, Project, Task, Log, Asset, Note, Invoice, Resource } from '@/types';
 import * as api from './api';
 
 interface AgencyState {
+  sidebarOpen: boolean;
   identity: Identity | null;
   projects: Project[];
   tasks: Task[];
   logs: Log[];
   assets: Asset[];
+  notes: Note[];
+  invoices: Invoice[];
+  resources: Resource[];
   
+  toggleSidebar: () => void;
   setIdentity: (identity: Identity) => void;
+
   
   // Projects
   addProject: (project: Omit<Project, 'id' | 'createdAt'>) => Promise<void>;
@@ -23,6 +29,19 @@ interface AgencyState {
   
   // Assets
   addAsset: (projectId: string, url: string, type: Asset['type']) => Promise<void>;
+
+  // Notes
+  addNote: (note: Omit<Note, 'id' | 'createdAt' | 'updatedAt'>) => void;
+  updateNote: (id: string, updates: Partial<Note>) => void;
+  deleteNote: (id: string) => void;
+
+  // Invoices
+  addInvoice: (invoice: Omit<Invoice, 'id' | 'createdAt'>) => void;
+  updateInvoice: (id: string, updates: Partial<Invoice>) => void;
+
+  // Resources
+  addResource: (resource: Omit<Resource, 'id' | 'createdAt'>) => void;
+  deleteResource: (id: string) => void;
   
   // Actions
   logAction: (projectId: string, action: string, details: string) => Promise<void>;
@@ -31,11 +50,17 @@ interface AgencyState {
 export const useStore = create<AgencyState>()(
   persist(
     (set, get) => ({
+      sidebarOpen: true,
       identity: null,
       projects: [],
       tasks: [],
       logs: [],
       assets: [],
+      notes: [],
+      invoices: [],
+      resources: [],
+
+      toggleSidebar: () => set((state) => ({ sidebarOpen: !state.sidebarOpen })),
 
       setIdentity: (identity) => set({ identity }),
 
@@ -107,6 +132,54 @@ export const useStore = create<AgencyState>()(
 
         set((state) => ({ assets: [...state.assets, newAsset] }));
         await get().logAction(projectId, 'Asset Uploaded', 'New asset added to project');
+      },
+
+      addNote: (noteData) => {
+        const newNote: Note = {
+          ...noteData,
+          id: crypto.randomUUID(),
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        };
+        set((state) => ({ notes: [newNote, ...state.notes] }));
+      },
+
+      updateNote: (id, updates) => {
+        set((state) => ({
+          notes: state.notes.map(n => n.id === id ? { ...n, ...updates, updatedAt: new Date().toISOString() } : n)
+        }));
+      },
+
+      deleteNote: (id) => {
+        set((state) => ({ notes: state.notes.filter(n => n.id !== id) }));
+      },
+
+      addInvoice: (invoiceData) => {
+        const newInvoice: Invoice = {
+          ...invoiceData,
+          id: crypto.randomUUID(),
+          createdAt: new Date().toISOString(),
+        };
+        set((state) => ({ invoices: [newInvoice, ...state.invoices] }));
+      },
+
+      updateInvoice: (id, updates) => {
+        set((state) => ({
+          invoices: state.invoices.map(i => i.id === id ? { ...i, ...updates } : i)
+        }));
+      },
+
+      addResource: (resourceData) => {
+        const newResource: Resource = {
+          ...resourceData,
+          id: crypto.randomUUID(),
+          createdAt: new Date().toISOString(),
+        };
+        set((state) => ({ resources: [newResource, ...state.resources] }));
+      },
+
+      deleteResource: (id) => {
+        set((state) => ({ resources: state.resources.filter(r => r.id !== id) }));
       },
 
       logAction: async (projectId, action, details) => {

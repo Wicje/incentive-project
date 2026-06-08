@@ -5,7 +5,7 @@ import StarterKit from '@tiptap/starter-kit';
 import Image from '@tiptap/extension-image';
 import Link from '@tiptap/extension-link';
 import { uploadToCloudinary } from '@/lib/api';
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Bold, Italic, List, ListOrdered, Link2, Image as ImageIcon } from 'lucide-react';
 
@@ -18,6 +18,11 @@ export default function Editor({
   onChange?: (html: string) => void;
   readOnly?: boolean;
 }) {
+  const [linkInputOpen, setLinkInputOpen] = useState(false);
+  const [imageInputOpen, setImageInputOpen] = useState(false);
+  const [linkUrl, setLinkUrl] = useState('');
+  const [imageUrl, setImageUrl] = useState('');
+
   const handleImageUpload = async (file: File) => {
     try {
       const url = await uploadToCloudinary(file);
@@ -76,38 +81,41 @@ export default function Editor({
     }
   }, [initialContent, readOnly, editor]);
 
-  const setLink = useCallback(() => {
+  const toggleLinkInput = () => {
     if (!editor) return;
-    const previousUrl = editor.getAttributes('link').href;
-    const url = window.prompt('URL', previousUrl);
-
-    if (url === null) {
-      return;
+    if (editor.isActive('link')) {
+      editor.chain().focus().unsetLink().run();
+    } else {
+      setLinkUrl(editor.getAttributes('link').href || '');
+      setLinkInputOpen(true);
+      setImageInputOpen(false);
     }
+  };
 
-    if (url === '') {
+  const applyLink = () => {
+    if (!editor) return;
+    if (linkUrl === '') {
       editor.chain().focus().extendMarkRange('link').unsetLink().run();
-      return;
+    } else {
+      editor.chain().focus().extendMarkRange('link').setLink({ href: linkUrl }).run();
     }
+    setLinkInputOpen(false);
+    setLinkUrl('');
+  };
 
-    editor.chain().focus().extendMarkRange('link').setLink({ href: url }).run();
-  }, [editor]);
+  const applyImage = () => {
+    if (!editor || !imageUrl) return;
+    editor.chain().focus().setImage({ src: imageUrl }).run();
+    setImageInputOpen(false);
+    setImageUrl('');
+  };
 
   if (!editor) {
     return null;
   }
 
-  const addImage = () => {
-    const defaultUrl = 'https://picsum.photos/800/600';
-    const url = window.prompt('URL (or let Cloudinary handle drop)', defaultUrl);
-    
-    if (url) {
-      editor.chain().focus().setImage({ src: url }).run();
-    }
-  };
-
   return (
-    <div className={`border rounded-lg overflow-hidden bg-white ${readOnly ? 'border-transparent' : 'border-zinc-200 shadow-sm'}`}>
+    <div className={`border rounded-lg overflow-visible bg-white ${readOnly ? 'border-transparent' : 'border-zinc-200 shadow-sm'} relative`}>
       {!readOnly && (
         <div className="flex flex-wrap items-center gap-1 p-2 border-b border-zinc-100 bg-zinc-50/50">
           <Button
@@ -148,23 +156,58 @@ export default function Editor({
             <ListOrdered className="w-4 h-4" />
           </Button>
           <div className="w-px h-4 bg-zinc-300 mx-1" />
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            onClick={setLink}
-            className={editor.isActive('link') ? 'bg-zinc-200' : ''}
-          >
-            <Link2 className="w-4 h-4" />
-          </Button>
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            onClick={addImage}
-          >
-            <ImageIcon className="w-4 h-4" />
-          </Button>
+          <div className="relative">
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={toggleLinkInput}
+              className={editor.isActive('link') ? 'bg-zinc-200' : ''}
+            >
+              <Link2 className="w-4 h-4" />
+            </Button>
+            {linkInputOpen && (
+              <div className="absolute top-full left-0 mt-1 p-2 bg-white border border-stone-200 rounded shadow-lg z-50 flex gap-2">
+                <input 
+                  type="url" 
+                  autoFocus
+                  placeholder="https://..." 
+                  value={linkUrl} 
+                  onChange={(e) => setLinkUrl(e.target.value)} 
+                  className="text-sm border border-stone-200 rounded px-2 py-1 w-48"
+                  onKeyDown={(e) => e.key === 'Enter' && applyLink()}
+                />
+                <Button size="sm" onClick={applyLink}>Add</Button>
+              </div>
+            )}
+          </div>
+          <div className="relative">
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={() => { setImageInputOpen(!imageInputOpen); setLinkInputOpen(false); }}
+            >
+              <ImageIcon className="w-4 h-4" />
+            </Button>
+            {imageInputOpen && (
+              <div className="absolute top-full left-0 mt-1 p-2 bg-white border border-stone-200 rounded shadow-lg z-50 flex flex-col gap-2 w-64">
+                <span className="text-xs text-stone-500 font-medium">Add Image via URL (or drop file below):</span>
+                <div className="flex gap-2">
+                  <input 
+                    type="url" 
+                    autoFocus
+                    placeholder="https://picsum..." 
+                    value={imageUrl} 
+                    onChange={(e) => setImageUrl(e.target.value)} 
+                    className="text-sm border border-stone-200 rounded px-2 py-1 flex-1"
+                    onKeyDown={(e) => e.key === 'Enter' && applyImage()}
+                  />
+                  <Button size="sm" onClick={applyImage}>Add</Button>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       )}
       <div className={`p-4 ${readOnly ? 'p-0 pb-10' : ''}`}>
