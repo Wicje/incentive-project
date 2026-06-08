@@ -31,17 +31,17 @@ interface AgencyState {
   addAsset: (projectId: string, url: string, type: Asset['type']) => Promise<void>;
 
   // Notes
-  addNote: (note: Omit<Note, 'id' | 'createdAt' | 'updatedAt'>) => void;
-  updateNote: (id: string, updates: Partial<Note>) => void;
-  deleteNote: (id: string) => void;
+  addNote: (note: Omit<Note, 'id' | 'createdAt' | 'updatedAt'>) => Promise<void>;
+  updateNote: (id: string, updates: Partial<Note>) => Promise<void>;
+  deleteNote: (id: string) => Promise<void>;
 
   // Invoices
-  addInvoice: (invoice: Omit<Invoice, 'id' | 'createdAt'>) => void;
-  updateInvoice: (id: string, updates: Partial<Invoice>) => void;
+  addInvoice: (invoice: Omit<Invoice, 'id' | 'createdAt'>) => Promise<void>;
+  updateInvoice: (id: string, updates: Partial<Invoice>) => Promise<void>;
 
   // Resources
-  addResource: (resource: Omit<Resource, 'id' | 'createdAt'>) => void;
-  deleteResource: (id: string) => void;
+  addResource: (resource: Omit<Resource, 'id' | 'createdAt'>) => Promise<void>;
+  deleteResource: (id: string) => Promise<void>;
   
   // Actions
   logAction: (projectId: string, action: string, details: string) => Promise<void>;
@@ -130,55 +130,66 @@ export const useStore = create<AgencyState>()(
           createdAt: new Date().toISOString(),
         };
 
+        await api.syncAsset(newAsset);
+
         set((state) => ({ assets: [...state.assets, newAsset] }));
         await get().logAction(projectId, 'Asset Uploaded', 'New asset added to project');
       },
 
-      addNote: (noteData) => {
+      addNote: async (noteData) => {
         const newNote: Note = {
           ...noteData,
           id: crypto.randomUUID(),
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
         };
+        await api.syncNote(newNote);
         set((state) => ({ notes: [newNote, ...state.notes] }));
       },
 
-      updateNote: (id, updates) => {
+      updateNote: async (id, updates) => {
         set((state) => ({
           notes: state.notes.map(n => n.id === id ? { ...n, ...updates, updatedAt: new Date().toISOString() } : n)
         }));
+        const updated = get().notes.find(n => n.id === id);
+        if (updated) await api.syncNote(updated);
       },
 
-      deleteNote: (id) => {
+      deleteNote: async (id) => {
+        await api.deleteNote(id);
         set((state) => ({ notes: state.notes.filter(n => n.id !== id) }));
       },
 
-      addInvoice: (invoiceData) => {
+      addInvoice: async (invoiceData) => {
         const newInvoice: Invoice = {
           ...invoiceData,
           id: crypto.randomUUID(),
           createdAt: new Date().toISOString(),
         };
+        await api.syncInvoice(newInvoice);
         set((state) => ({ invoices: [newInvoice, ...state.invoices] }));
       },
 
-      updateInvoice: (id, updates) => {
+      updateInvoice: async (id, updates) => {
         set((state) => ({
           invoices: state.invoices.map(i => i.id === id ? { ...i, ...updates } : i)
         }));
+        const updated = get().invoices.find(i => i.id === id);
+        if (updated) await api.syncInvoice(updated);
       },
 
-      addResource: (resourceData) => {
+      addResource: async (resourceData) => {
         const newResource: Resource = {
           ...resourceData,
           id: crypto.randomUUID(),
           createdAt: new Date().toISOString(),
         };
+        await api.syncResource(newResource);
         set((state) => ({ resources: [newResource, ...state.resources] }));
       },
 
-      deleteResource: (id) => {
+      deleteResource: async (id) => {
+        await api.deleteResourceApi(id);
         set((state) => ({ resources: state.resources.filter(r => r.id !== id) }));
       },
 

@@ -71,15 +71,15 @@ export default function ProjectDetail() {
   ];
 
   return (
-    <div className="flex flex-col h-full bg-[#FAF9F6]">
+    <div className="flex flex-col h-full bg-zinc-50">
       {/* Header */}
-      <header className="border-b border-stone-200/60 px-8 py-6 flex flex-col md:flex-row md:items-end justify-between gap-6 bg-zinc-50 sticky top-0 z-10 shrink-0">
+      <header className="border-b border-zinc-200/60 px-6 py-4 flex flex-col md:flex-row md:items-end justify-between gap-4 bg-zinc-50 sticky top-0 z-10 shrink-0">
         <div>
-          <Link href="/" className="inline-flex items-center text-[10px] uppercase tracking-widest font-bold text-stone-400 hover:text-stone-800 mb-4 transition-colors">
+          <Link href="/" className="inline-flex items-center text-[10px] uppercase tracking-widest font-bold text-zinc-400 hover:text-zinc-800 mb-2 transition-colors">
             <ArrowLeft className="w-3 h-3 mr-2" /> Back to Workspace
           </Link>
           <div className="flex items-center gap-4">
-            <h1 className="text-4xl md:text-5xl font-serif font-bold tracking-tight text-zinc-900">{project.name}</h1>
+            <h1 className="text-3xl md:text-4xl font-serif font-bold tracking-tight text-zinc-900">{project.name}</h1>
             <div className="relative">
               <button 
                 onClick={() => setIsStatusMenuOpen(!isStatusMenuOpen)}

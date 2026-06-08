@@ -1,6 +1,6 @@
-import { Project, Task, Log } from '@/types';
+import { Project, Task, Log, Asset, Note, Invoice, Resource } from '@/types';
 import { db } from './firebase';
-import { doc, setDoc } from 'firebase/firestore';
+import { doc, setDoc, deleteDoc } from 'firebase/firestore';
 
 export async function syncProject(project: Project) {
   try {
@@ -23,6 +23,54 @@ export async function syncLog(log: Log) {
     await setDoc(doc(db, 'logs', log.id), log);
   } catch (err) {
     console.error('Failed to sync log to Firebase:', err);
+  }
+}
+
+export async function syncAsset(asset: Asset) {
+  try {
+    await setDoc(doc(db, 'assets', asset.id), asset);
+  } catch (err) {
+    console.error('Failed to sync asset to Firebase:', err);
+  }
+}
+
+export async function syncNote(note: Note) {
+  try {
+    await setDoc(doc(db, 'notes', note.id), note);
+  } catch (err) {
+    console.error('Failed to sync note to Firebase:', err);
+  }
+}
+
+export async function deleteNote(id: string) {
+  try {
+    await deleteDoc(doc(db, 'notes', id));
+  } catch (err) {
+    console.error('Failed to delete note from Firebase:', err);
+  }
+}
+
+export async function syncInvoice(invoice: Invoice) {
+  try {
+    await setDoc(doc(db, 'invoices', invoice.id), invoice);
+  } catch (err) {
+    console.error('Failed to sync invoice to Firebase:', err);
+  }
+}
+
+export async function syncResource(resource: Resource) {
+  try {
+    await setDoc(doc(db, 'resources', resource.id), resource);
+  } catch (err) {
+    console.error('Failed to sync resource to Firebase:', err);
+  }
+}
+
+export async function deleteResourceApi(id: string) {
+  try {
+    await deleteDoc(doc(db, 'resources', id));
+  } catch (err) {
+    console.error('Failed to delete resource from Firebase:', err);
   }
 }
 

@@ -67,7 +67,7 @@ export default function Dashboard() {
   const activeTasks = tasks.filter(t => t.status !== 'done');
 
   return (
-    <div className="p-8 md:p-12 max-w-7xl mx-auto space-y-12">
+    <div className="p-6 md:p-12 max-w-7xl mx-auto space-y-12">
       
       <header className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-6 border-b border-stone-200/50">
         <div>
