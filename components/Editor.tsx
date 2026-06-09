@@ -49,7 +49,7 @@ export default function Editor({
     },
     editorProps: {
       attributes: {
-        class: 'prose prose-sm prose-zinc sm:prose-base focus:outline-none max-w-none min-h-[65vh]',
+        class: 'prose prose-stone prose-sm sm:prose-base font-sans focus:outline-none max-w-none min-h-[65vh] prose-headings:font-semibold prose-headings:tracking-tight prose-a:text-blue-600',
       },
       handleDrop: (view, event, slice, moved) => {
         if (!moved && event.dataTransfer && event.dataTransfer.files && event.dataTransfer.files[0]) {

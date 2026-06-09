@@ -1,12 +1,51 @@
 import { Project, Task, Log, Asset, Note, Invoice, Resource } from '@/types';
 import { db } from './firebase';
-import { doc, setDoc, deleteDoc } from 'firebase/firestore';
+import { doc, setDoc, deleteDoc, collection, getDocs } from 'firebase/firestore';
+
+export async function fetchAllData() {
+  const result: any = {
+    projects: [], tasks: [], logs: [], assets: [], notes: [], invoices: [], resources: []
+  };
+  try {
+    const pSnap = await getDocs(collection(db, 'projects'));
+    pSnap.forEach(d => result.projects.push(d.data()));
+    
+    const tSnap = await getDocs(collection(db, 'tasks'));
+    tSnap.forEach(d => result.tasks.push(d.data()));
+
+    const lSnap = await getDocs(collection(db, 'logs'));
+    lSnap.forEach(d => result.logs.push(d.data()));
+    
+    const aSnap = await getDocs(collection(db, 'assets'));
+    aSnap.forEach(d => result.assets.push(d.data()));
+
+    const nSnap = await getDocs(collection(db, 'notes'));
+    nSnap.forEach(d => result.notes.push(d.data()));
+
+    const iSnap = await getDocs(collection(db, 'invoices'));
+    iSnap.forEach(d => result.invoices.push(d.data()));
+
+    const rSnap = await getDocs(collection(db, 'resources'));
+    rSnap.forEach(d => result.resources.push(d.data()));
+  } catch (err) {
+    console.error('Failed to fetch from Firebase', err);
+  }
+  return result;
+}
 
 export async function syncProject(project: Project) {
   try {
     await setDoc(doc(db, 'projects', project.id), project);
   } catch (err) {
     console.error('Failed to sync project to Firebase:', err);
+  }
+}
+
+export async function deleteProject(id: string) {
+  try {
+    await deleteDoc(doc(db, 'projects', id));
+  } catch (err) {
+    console.error('Failed to delete project from Firebase:', err);
   }
 }
 

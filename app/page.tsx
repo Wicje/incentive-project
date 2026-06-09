@@ -88,46 +88,50 @@ export default function Dashboard() {
   return (
     <div className="p-6 md:p-12 max-w-7xl mx-auto space-y-12">
       
-      <header className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-6 border-b border-stone-200/50">
-        <div>
-          <h1 className="text-4xl font-serif font-semibold tracking-tight text-stone-900 mb-2">Agency Dashboard</h1>
-          <p className="text-stone-500 font-medium tracking-wide text-sm">Welcome back, {identity.name}. Here&apos;s the state of your agency.</p>
-        </div>
+      <header className="pt-8 pb-10 flex flex-col items-start justify-center gap-2">
+        <h1 className="text-[32px] sm:text-[36px] font-sans font-bold tracking-tight text-stone-900 leading-tight">Good {new Date().getHours() < 12 ? 'morning' : new Date().getHours() < 18 ? 'afternoon' : 'evening'}, {identity.name.split(' ')[0]}</h1>
+        <p className="text-stone-500 font-medium text-[15px]">Here's what's happening in your workspace today.</p>
       </header>
 
       {/* Navigation / Domains Bento Grid */}
-      <section className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        {[
-          { name: 'Inbox & Ideas', icon: Command, color: 'bg-stone-100 text-stone-700', href: '/inbox' },
-          { name: 'Client Pipeline', icon: Folder, color: 'bg-stone-100 text-stone-700', href: '/pipeline' },
-          { name: 'Finance & Invoices', icon: FileText, color: 'bg-stone-100 text-stone-700', href: '/finance' },
-          { name: 'Resource Library', icon: Activity, color: 'bg-stone-100 text-stone-700', href: '/resources' },
-        ].map((domain, i) => (
-          <Link href={domain.href} key={i}>
-            <button className="w-full flex flex-col items-start gap-4 p-5 bg-white border border-stone-200 rounded-2xl hover:bg-stone-50 transition-colors shadow-sm text-left group h-full">
-              <div className={`p-2.5 rounded-lg ${domain.color} group-hover:scale-105 transition-transform`}>
-                <domain.icon className="w-5 h-5" />
-              </div>
-              <span className="font-semibold text-stone-800 text-sm tracking-wide">{domain.name}</span>
-            </button>
-          </Link>
-        ))}
+      <section className="space-y-4">
+        <h2 className="text-[14px] font-medium tracking-tight text-stone-500 px-1 flex items-center gap-2">
+          <Folder className="w-4 h-4 text-stone-400" />
+          Quick Links
+        </h2>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          {[
+            { name: 'Inbox & Ideas', icon: Command, color: 'text-stone-700', href: '/inbox' },
+            { name: 'Client Pipeline', icon: Folder, color: 'text-stone-700', href: '/pipeline' },
+            { name: 'Finance & Invoices', icon: FileText, color: 'text-stone-700', href: '/finance' },
+            { name: 'Resource Library', icon: Activity, color: 'text-stone-700', href: '/resources' },
+          ].map((domain, i) => (
+            <Link href={domain.href} key={i}>
+              <button className="w-full flex items-center gap-3 p-4 bg-white border border-[#EFEFEF] rounded-[10px] hover:bg-[#F9F9F8] transition-colors shadow-sm text-left group h-full">
+                <div className={`p-2 rounded-md bg-[#F4F4F4] group-hover:bg-white transition-colors border border-transparent group-hover:border-[#EFEFEF] ${domain.color}`}>
+                  <domain.icon className="w-4 h-4" />
+                </div>
+                <span className="font-medium text-stone-800 text-[14px] tracking-tight">{domain.name}</span>
+              </button>
+            </Link>
+          ))}
+        </div>
       </section>
 
       {/* Action Bar */}
-      <section className="flex items-center gap-3 pb-2">
+      <section className="flex items-center gap-2 pb-2">
         <button 
           onClick={() => setIsCreating(!isCreating)}
-          className="flex items-center gap-2 px-4 py-2 bg-stone-900 text-white rounded-lg hover:bg-stone-800 transition-colors shadow-sm text-sm font-medium"
+          className="flex items-center gap-1.5 px-3 py-1.5 bg-stone-900 text-white rounded-[6px] hover:bg-stone-800 transition-colors shadow-sm text-[13px] font-medium"
         >
-          <Plus className="w-4 h-4" />
+          <Plus className="w-3.5 h-3.5" />
           New Project
         </button>
         <button 
           onClick={() => { setIsCreatingTask(!isCreatingTask); setIsCreating(false); }}
-          className="flex items-center gap-2 px-4 py-2 bg-white text-stone-700 border border-stone-200 rounded-lg hover:bg-stone-50 transition-colors shadow-sm text-sm font-medium"
+          className="flex items-center gap-1.5 px-3 py-1.5 bg-white text-stone-700 border border-[#EFEFEF] rounded-[6px] hover:bg-[#F9F9F8] transition-colors shadow-sm text-[13px] font-medium"
         >
-          <CheckCircle2 className="w-4 h-4 text-stone-400" />
+          <Plus className="w-3.5 h-3.5 text-stone-400" />
           Add Task
         </button>
       </section>
@@ -135,7 +139,7 @@ export default function Dashboard() {
       {isCreating && (
         <section className="bg-white border border-stone-200 rounded-xl p-8 shadow-sm">
           <div className="flex items-center justify-between mb-6 border-b border-stone-100 pb-4">
-            <h3 className="font-serif text-2xl font-semibold text-stone-800">Initiate Project</h3>
+            <h3 className="font-sans text-xl tracking-tight font-semibold text-stone-900">Initiate Project</h3>
             <Button variant="ghost" size="sm" onClick={() => setIsCreating(false)}>Cancel</Button>
           </div>
           <form onSubmit={handleCreate} className="grid grid-cols-1 md:grid-cols-4 gap-6">
@@ -199,7 +203,7 @@ export default function Dashboard() {
       {isCreatingTask && (
         <section className="bg-white border border-stone-200 rounded-xl p-8 shadow-sm">
           <div className="flex items-center justify-between mb-6 border-b border-stone-100 pb-4">
-            <h3 className="font-serif text-2xl font-semibold text-stone-800">New Task</h3>
+            <h3 className="font-sans text-xl tracking-tight font-semibold text-stone-900">New Task</h3>
             <Button variant="ghost" size="sm" onClick={() => setIsCreatingTask(false)}>Cancel</Button>
           </div>
           <form onSubmit={handleCreateTask} className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -236,13 +240,16 @@ export default function Dashboard() {
         </section>
       )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 pt-4">
         
         {/* Active Projects Container */}
         <section className="lg:col-span-8 space-y-4">
           <div className="flex items-center justify-between px-1">
-            <h2 className="text-sm font-semibold tracking-wider uppercase text-stone-400">Project Boards</h2>
-            <span className="text-xs text-stone-400 font-mono tracking-widest">COUNT {projects.length}</span>
+            <h2 className="text-[14px] font-medium tracking-tight text-stone-500 flex items-center gap-2">
+              <Folder className="w-4 h-4 text-stone-400" />
+              Active Projects
+            </h2>
+            <span className="text-[12px] text-stone-400 font-medium">COUNT {projects.length}</span>
           </div>
 
           {projects.length === 0 ? (
@@ -258,26 +265,22 @@ export default function Dashboard() {
                 
                 return (
                   <Link key={project.id} href={`/projects/${project.id}`}>
-                    <div className="group border border-stone-200 rounded-2xl p-6 hover:shadow-md transition-all hover:border-stone-300 bg-white cursor-pointer h-full flex flex-col">
-                      <div className="flex justify-between items-start mb-4">
-                        <div className="p-2.5 bg-stone-100 rounded-lg group-hover:bg-[#EAE8E3] transition-colors">
-                          <Folder className="w-5 h-5 text-stone-600" />
+                    <div className="group border border-[#EFEFEF] rounded-[10px] p-5 hover:bg-[#F9F9F8] transition-colors bg-white cursor-pointer h-full flex flex-col shadow-sm">
+                      <div className="flex justify-between items-start mb-3">
+                        <div className="flex items-center gap-2 text-stone-600">
+                          <FileText className="w-4 h-4 text-blue-500" />
+                          <span className="text-[14px] font-medium text-stone-900 group-hover:text-stone-700 transition-colors line-clamp-1 truncate">{project.name}</span>
                         </div>
-                        <span className="text-[10px] uppercase tracking-widest font-bold px-2.5 py-1 rounded-sm border border-stone-200 text-stone-500 bg-stone-50 group-hover:bg-white inset-ring">
-                          {project.status.replace('-', ' ')}
-                        </span>
                       </div>
+                      <p className="text-[13px] text-stone-500 mb-6 pl-6">{project.client}</p>
                       
-                      <h3 className="font-serif font-bold text-xl text-stone-900 group-hover:text-stone-600 transition-colors line-clamp-1 mb-1">{project.name}</h3>
-                      <p className="text-sm font-medium text-stone-500 mb-6">{project.client}</p>
-                      
-                      <div className="mt-auto space-y-2">
-                        <div className="flex items-center justify-between text-xs font-semibold text-stone-500">
+                      <div className="mt-auto space-y-2 pl-6">
+                        <div className="flex items-center justify-between text-[12px] font-medium text-stone-500">
                           <span>Progress</span>
-                          <span className="font-mono">{progress}%</span>
+                          <span>{progress}%</span>
                         </div>
-                        <div className="h-1.5 w-full bg-stone-100 rounded-full overflow-hidden">
-                          <div className="h-full bg-stone-800 transition-all duration-500" style={{ width: `${progress}%` }} />
+                        <div className="h-1 w-full bg-[#EFEFEF] rounded-full overflow-hidden">
+                          <div className="h-full bg-blue-500 transition-all duration-500" style={{ width: `${progress}%` }} />
                         </div>
                       </div>
                     </div>
@@ -293,8 +296,11 @@ export default function Dashboard() {
 
           {/* Active Tasks list */}
           <section className="space-y-4">
-            <h2 className="text-sm font-semibold tracking-wider uppercase text-stone-400 px-1">Tasks Today</h2>
-            <div className="bg-white border border-stone-200 rounded-2xl p-5 shadow-sm">
+            <h2 className="text-[14px] font-medium tracking-tight text-stone-500 px-1 flex items-center gap-2">
+              <CheckCircle2 className="w-4 h-4 text-stone-400" />
+              Tasks today
+            </h2>
+            <div className="bg-white border border-[#EFEFEF] rounded-[10px] p-5 shadow-sm">
               {activeTasks.length === 0 ? (
                 <p className="text-stone-400 text-sm text-center py-6">All caught up.</p>
               ) : (
@@ -320,7 +326,10 @@ export default function Dashboard() {
 
           {/* Recent Activity */}
           <section className="space-y-4">
-            <h2 className="text-sm font-semibold tracking-wider uppercase text-stone-400 px-1">Activity Log</h2>
+            <h2 className="text-[14px] font-medium tracking-tight text-stone-500 px-1 flex items-center gap-2">
+              <Activity className="w-4 h-4 text-stone-400" />
+              Activity log
+            </h2>
             <div className="bg-transparent">
               {logs.length === 0 ? (
                 <p className="text-stone-400 text-sm py-4">No activity recorded yet.</p>
@@ -329,9 +338,9 @@ export default function Dashboard() {
                   {logs.slice(0, 5).map((log) => {
                     const project = projects.find(p => p.id === log.projectId);
                     return (
-                      <div key={log.id} className="flex gap-4 p-4 border border-stone-200 rounded-xl bg-white shadow-sm hover:border-stone-300 transition-colors">
-                        <div className="w-8 h-8 rounded-full bg-stone-100 flex items-center justify-center shrink-0 border border-stone-200/60">
-                          <Activity className="w-4 h-4 text-stone-500" />
+                      <div key={log.id} className="flex gap-4 p-4 border border-[#EFEFEF] rounded-[10px] bg-white shadow-sm hover:bg-[#F9F9F8] transition-colors">
+                        <div className="w-8 h-8 rounded shrink-0 border border-transparent bg-stone-50 flex items-center justify-center">
+                          <Activity className="w-4 h-4 text-stone-400" />
                         </div>
                         <div className="flex-1 min-w-0">
                           <p className="text-sm font-medium text-stone-800 truncate">{log.action}</p>

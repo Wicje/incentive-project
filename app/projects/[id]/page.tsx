@@ -1,17 +1,18 @@
 "use client";
 
 import { useStore } from '@/lib/store';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { useState, use, useEffect } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, CheckCircle2, Circle, Clock, MoreVertical, Eye, FileImage } from 'lucide-react';
+import { ArrowLeft, CheckCircle2, Circle, Clock, MoreVertical, Eye, FileImage, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Editor from '@/components/Editor';
 import { TaskStage, TaskStatus } from '@/types';
 
 export default function ProjectDetail() {
   const { id } = useParams() as { id: string };
-  const { projects, tasks, addTask, updateTask, updateProjectCanvas, addAsset, assets } = useStore();
+  const router = useRouter();
+  const { projects, tasks, addTask, updateTask, updateProjectCanvas, addAsset, assets, deleteProject } = useStore();
   const [mounted, setMounted] = useState(false);
   
   const project = projects.find(p => p.id === id);
@@ -21,16 +22,17 @@ export default function ProjectDetail() {
   const [newTaskTitle, setNewTaskTitle] = useState('');
   const [activeTab, setActiveTab] = useState<'canvas' | 'board' | 'assets'>('canvas');
   const [isStatusMenuOpen, setIsStatusMenuOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);
   }, []);
 
-  if (!mounted) return <div className="p-12 text-stone-500 font-serif">Loading...</div>;
+  if (!mounted) return <div className="p-12 text-stone-500 font-sans text-[14px]">Loading...</div>;
 
   if (!project) {
-    return <div className="p-12 text-stone-500 font-serif">Project not found</div>;
+    return <div className="p-12 text-stone-500 font-sans text-[14px]">Project not found</div>;
   }
 
   const handleUpdateStatus = (newStatus: 'planning' | 'in-progress' | 'review' | 'completed') => {
@@ -71,29 +73,29 @@ export default function ProjectDetail() {
   ];
 
   return (
-    <div className="flex flex-col h-full bg-zinc-50">
+    <div className="flex flex-col h-full bg-white">
       {/* Header */}
-      <header className="border-b border-zinc-200/60 px-6 py-4 flex flex-col md:flex-row md:items-end justify-between gap-4 bg-zinc-50 sticky top-0 z-10 shrink-0">
+      <header className="border-b border-[#EFEFEF] px-8 py-6 flex flex-col md:flex-row md:items-end justify-between gap-4 bg-white sticky top-0 z-10 shrink-0">
         <div>
-          <Link href="/" className="inline-flex items-center text-[10px] uppercase tracking-widest font-bold text-zinc-400 hover:text-zinc-800 mb-2 transition-colors">
-            <ArrowLeft className="w-3 h-3 mr-2" /> Back to Workspace
+          <Link href="/" className="inline-flex items-center text-[12px] font-medium text-stone-500 hover:text-stone-900 mb-3 transition-colors">
+            <ArrowLeft className="w-3.5 h-3.5 mr-1" /> Back to Workspace
           </Link>
           <div className="flex items-center gap-4">
-            <h1 className="text-3xl md:text-4xl font-serif font-bold tracking-tight text-zinc-900">{project.name}</h1>
+            <h1 className="text-3xl tracking-tight font-bold text-stone-900">{project.name}</h1>
             <div className="relative">
               <button 
                 onClick={() => setIsStatusMenuOpen(!isStatusMenuOpen)}
-                className="text-[10px] uppercase tracking-widest font-bold px-2.5 py-1 bg-stone-100 text-stone-600 rounded border border-stone-200 hover:bg-stone-200 transition-colors flex items-center gap-1 cursor-pointer"
+                className="text-[12px] font-medium px-2 py-1 bg-stone-100 text-stone-600 rounded border border-[#EFEFEF] hover:bg-stone-200 transition-colors flex items-center gap-1 cursor-pointer"
               >
                 {project.status.replace('-', ' ')}
                 <MoreVertical className="w-3 h-3 -mr-1" />
               </button>
               {isStatusMenuOpen && (
-                <div className="absolute top-full left-0 mt-2 w-40 bg-white border border-stone-200 rounded-lg shadow-lg py-1 z-50">
+                <div className="absolute top-full left-0 mt-2 w-40 bg-white border border-[#EFEFEF] rounded-lg shadow-lg py-1 z-50">
                   {['planning', 'in-progress', 'review', 'completed'].map((s) => (
                     <button
                       key={s}
-                      className={`w-full text-left px-4 py-2 text-xs uppercase tracking-wider font-bold hover:bg-stone-50 ${project.status === s ? 'text-stone-900 bg-stone-50/50' : 'text-stone-500'}`}
+                      className={`w-full text-left px-4 py-2 text-[13px] font-medium hover:bg-stone-50 transition-colors ${project.status === s ? 'text-stone-900 bg-stone-50/50' : 'text-stone-500'}`}
                       onClick={() => handleUpdateStatus(s as any)}
                     >
                       {s.replace('-', ' ')}
@@ -103,10 +105,18 @@ export default function ProjectDetail() {
               )}
             </div>
           </div>
-          <p className="text-stone-500 mt-2 tracking-wide font-medium">Prepared for <span className="text-stone-900 font-bold">{project.client}</span></p>
+          <p className="text-stone-500 mt-2 font-medium text-[14px]">Prepared for <span className="text-stone-900 font-bold">{project.client}</span></p>
         </div>
         
         <div className="flex items-center gap-3">
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            className="text-stone-400 hover:text-red-600 hover:bg-red-50"
+            onClick={() => setIsDeleteDialogOpen(true)}
+          >
+            <Trash2 className="w-4 h-4" />
+          </Button>
           <Button 
             variant="outline" 
             size="sm" 
@@ -164,19 +174,19 @@ Your Agency`;
       </header>
 
       {/* Tabs */}
-      <div className="px-8 border-b border-stone-200/60 bg-[#FAF9F6] shrink-0">
-        <nav className="flex gap-8">
+      <div className="px-8 border-b border-[#EFEFEF] bg-white shrink-0">
+        <nav className="flex gap-6">
           {(['canvas', 'board', 'assets'] as const).map(tab => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
-              className={`py-4 text-sm font-semibold uppercase tracking-wider transition-colors border-b-2 ${
+              className={`py-3 text-[14px] font-medium capitalize transition-colors border-b-2 ${
                 activeTab === tab 
                   ? 'border-stone-900 text-stone-900' 
-                  : 'border-transparent text-stone-400 hover:text-stone-700'
+                  : 'border-transparent text-stone-500 hover:text-stone-800'
               }`}
             >
-              {tab}
+              Project {tab}
             </button>
           ))}
         </nav>
@@ -186,12 +196,8 @@ Your Agency`;
         <div className="max-w-6xl mx-auto">
           {/* Canvas View */}
           {activeTab === 'canvas' && (
-            <div className="space-y-4">
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-xl font-serif font-semibold text-stone-800">Project Canvas</h2>
-                <p className="text-xs font-medium tracking-wide text-stone-400">Drag & drop images anywhere into the editor</p>
-              </div>
-              <div className="bg-white rounded-2xl shadow-sm border border-stone-200/80 overflow-hidden">
+            <div className="space-y-2">
+              <div className="bg-white rounded-lg border border-[#EFEFEF] shadow-sm overflow-visible pb-4">
                 <Editor 
                   initialContent={project.canvasContent || ''} 
                   onChange={(html) => updateProjectCanvas(project.id, html)} 
@@ -206,27 +212,27 @@ Your Agency`;
               {stages.map(stage => {
                 const stageTasks = projectTasks.filter(t => t.stage === stage.id);
                 return (
-                  <div key={stage.id} className="bg-white/50 rounded-2xl p-4 border border-stone-200/60">
-                    <div className="flex items-center justify-between mb-4 px-1">
-                      <h3 className="font-semibold text-stone-800 text-sm tracking-wide">{stage.label}</h3>
-                      <span className="bg-stone-100 text-stone-500 font-mono text-[10px] py-1 px-2 rounded font-bold shadow-sm">{stageTasks.length}</span>
+                  <div key={stage.id} className="bg-[#FAF9F6] rounded-xl p-3 border border-transparent">
+                    <div className="flex items-center justify-between mb-3 px-1">
+                      <h3 className="font-semibold text-stone-900 text-sm">{stage.label}</h3>
+                      <span className="bg-[#EFEBE4] text-stone-600 text-[11px] py-[2px] px-2.5 rounded font-medium">{stageTasks.length}</span>
                     </div>
                     
-                    <div className="space-y-3">
+                    <div className="space-y-2.5">
                       {stageTasks.map(task => (
-                        <div key={task.id} className="bg-white p-4 rounded-xl shadow-sm border border-stone-200 flex items-start gap-3 group">
+                        <div key={task.id} className="bg-white p-3 rounded-lg shadow-[0_1px_2px_rgba(0,0,0,0.05)] border border-stone-200/60 flex items-start gap-2 group">
                           <button 
-                            className="mt-0.5 text-stone-300 group-hover:text-stone-500 transition-colors"
+                            className="mt-[3px] text-stone-300 group-hover:text-stone-500 transition-colors"
                             onClick={() => toggleTaskStatus(task.id, task.status)}
                           >
                             {task.status === 'done' ? (
-                              <CheckCircle2 className="w-5 h-5 text-stone-900" />
+                              <CheckCircle2 className="w-[18px] h-[18px] text-stone-900" />
                             ) : (
-                              <Circle className="w-5 h-5" />
+                              <Circle className="w-[18px] h-[18px]" />
                             )}
                           </button>
-                          <div className="flex-1 pt-0.5">
-                            <p className={`text-sm font-medium leading-snug ${task.status === 'done' ? 'line-through text-stone-400' : 'text-stone-800'}`}>
+                          <div className="flex-1">
+                            <p className={`text-[13px] font-medium leading-normal ${task.status === 'done' ? 'line-through text-stone-400' : 'text-stone-800'}`}>
                               {task.title}
                             </p>
                           </div>
@@ -240,8 +246,8 @@ Your Agency`;
                         <input 
                           type="text" 
                           name="title"
-                          placeholder="Add task..." 
-                          className="w-full bg-white/80 text-sm border border-stone-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-1 focus:ring-stone-400 focus:border-stone-400 shadow-sm transition-all text-stone-700 placeholder:text-stone-400"
+                          placeholder="Add a task..." 
+                          className="w-full bg-white text-[13px] border border-stone-200/60 rounded-lg px-3 py-2.5 focus:outline-none focus:ring-1 focus:ring-stone-400 focus:border-stone-400 shadow-sm transition-all text-stone-700 placeholder:text-stone-400"
                         />
                       </form>
                     </div>
@@ -323,6 +329,40 @@ Your Agency`;
 
         </div>
       </div>
+
+      {isDeleteDialogOpen && (
+        <>
+          <div className="fixed inset-0 z-[100] bg-stone-900/40 backdrop-blur-sm transition-opacity" onClick={() => setIsDeleteDialogOpen(false)} />
+          <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[101] bg-white rounded-xl shadow-xl border border-stone-200/60 p-6 w-[90%] max-w-md animate-in fade-in zoom-in-95 duration-200">
+            <h3 className="font-sans text-xl font-bold text-stone-900 mb-2">Delete Project?</h3>
+            <p className="text-sm text-stone-500 mb-6 font-medium leading-relaxed">
+              Are you sure you want to delete <span className="font-bold text-stone-700">"{project.name}"</span>? This action cannot be undone and will permanently remove all tasks, assets, and project data.
+            </p>
+            
+            <div className="flex gap-3 justify-end mt-4">
+              <Button type="button" variant="outline" className="text-stone-600 border-stone-200/60 shadow-sm" onClick={() => setIsDeleteDialogOpen(false)}>
+                Cancel
+              </Button>
+              <Button 
+                type="button" 
+                className="bg-red-600 text-white hover:bg-red-700 shadow-sm border border-transparent" 
+                onClick={async () => {
+                  try {
+                    await deleteProject(project.id);
+                    router.push('/pipeline');
+                  } catch (e) {
+                    console.error("Delete failed", e);
+                  } finally {
+                    setIsDeleteDialogOpen(false);
+                  }
+                }}
+              >
+                Delete Project
+              </Button>
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
 }

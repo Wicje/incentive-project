@@ -73,6 +73,7 @@ export default function InvoicePage() {
       <div className="w-full max-w-[800px] bg-[#FEFCFA] rounded-[24px] overflow-hidden shadow-xl shadow-stone-900/5 mb-24 print:shadow-none print:mb-0 print:bg-white relative">
         <div className="h-48 w-full bg-[#EAE1D3] relative overflow-hidden m-6 mb-8 rounded-[16px] w-[calc(100%-48px)]">
           {/* Default desert placeholder, like the reference */}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img 
             src="https://images.unsplash.com/photo-1682687982501-1e5898cb8f4b?q=80&w=2070&auto=format&fit=crop" 
             alt="Cover" 
@@ -193,10 +194,19 @@ export default function InvoicePage() {
         </div>
         
         <div className="flex items-center gap-1">
-          <button onClick={() => window.print()} className="p-2 hover:bg-white/10 rounded-full transition-colors" title="Print">
+          <button onClick={() => {
+            try {
+              window.print();
+            } catch (e) {
+              alert("Printing is disabled in this preview environment. Please open the app in a new tab to print, or use your browser's print function.");
+            }
+          }} className="p-2 hover:bg-black/5 rounded-full transition-colors" title="Print">
             <Printer className="w-4 h-4" />
           </button>
-          <button className="p-2 hover:bg-white/10 rounded-full transition-colors" title="Download PDF">
+          <button onClick={() => {
+             alert("To save as PDF, click print and select 'Save as PDF' as the destination."); 
+             try { window.print(); } catch (e) {} 
+          }} className="p-2 hover:bg-black/5 rounded-full transition-colors" title="Download PDF">
             <Download className="w-4 h-4" />
           </button>
         </div>

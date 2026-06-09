@@ -22,6 +22,7 @@ interface AgencyState {
   addProject: (project: Omit<Project, 'id' | 'createdAt'>) => Promise<string>;
   updateProject: (id: string, updates: Partial<Project>) => Promise<void>;
   updateProjectCanvas: (id: string, content: string) => Promise<void>;
+  deleteProject: (id: string) => Promise<void>;
   
   // Tasks
   addTask: (task: Omit<Task, 'id' | 'createdAt'>) => Promise<void>;
@@ -31,7 +32,7 @@ interface AgencyState {
   addAsset: (projectId: string, url: string, type: Asset['type']) => Promise<void>;
 
   // Notes
-  addNote: (note: Omit<Note, 'id' | 'createdAt' | 'updatedAt'>) => Promise<void>;
+  addNote: (note: Omit<Note, 'id' | 'createdAt' | 'updatedAt'>) => Promise<string>;
   updateNote: (id: string, updates: Partial<Note>) => Promise<void>;
   deleteNote: (id: string) => Promise<void>;
 
@@ -45,6 +46,7 @@ interface AgencyState {
   
   // Actions
   logAction: (projectId: string, action: string, details: string) => Promise<void>;
+  initFromFirebase: () => Promise<void>;
 }
 
 export const useStore = create<AgencyState>()(
@@ -99,6 +101,16 @@ export const useStore = create<AgencyState>()(
         }));
         const updated = get().projects.find(p => p.id === id);
         if (updated) await api.syncProject(updated); // Sync canvas state too
+      },
+
+      deleteProject: async (id) => {
+        set((state) => ({
+          projects: state.projects.filter(p => p.id !== id),
+          tasks: state.tasks.filter(t => t.projectId !== id),
+          logs: state.logs.filter(l => l.projectId !== id),
+          assets: state.assets.filter(a => a.projectId !== id)
+        }));
+        await api.deleteProject(id);
       },
 
       addTask: async (taskData) => {
@@ -158,6 +170,7 @@ export const useStore = create<AgencyState>()(
           if (state.notes.some(n => n.id === newNote.id)) return state;
           return { notes: [newNote, ...state.notes] };
         });
+        return newNote.id;
       },
 
       updateNote: async (id, updates) => {
@@ -231,6 +244,19 @@ export const useStore = create<AgencyState>()(
           if (state.logs.some(l => l.id === newLog.id)) return state;
           return { logs: [newLog, ...state.logs] };
         });
+      },
+
+      initFromFirebase: async () => {
+        const data = await api.fetchAllData();
+        set((state) => ({
+          projects: data.projects.length ? data.projects : state.projects,
+          tasks: data.tasks.length ? data.tasks : state.tasks,
+          logs: data.logs.length ? data.logs : state.logs,
+          assets: data.assets.length ? data.assets : state.assets,
+          notes: data.notes.length ? data.notes : state.notes,
+          invoices: data.invoices.length ? data.invoices : state.invoices,
+          resources: data.resources.length ? data.resources : state.resources,
+        }));
       },
     }),
     {
