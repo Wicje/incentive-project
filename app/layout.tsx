@@ -24,6 +24,8 @@ export const metadata: Metadata = {
   description: 'Bold, aesthetic, persistent agency operating system.',
 };
 
+import { Toaster } from 'sonner';
+
 export default function RootLayout({children}: {children: React.ReactNode}) {
   return (
     <html lang="en" className={`${inter.variable} ${jetbrainsMono.variable} ${spaceGrotesk.variable}`}>
@@ -32,6 +34,7 @@ export default function RootLayout({children}: {children: React.ReactNode}) {
           <IdentityModal />
           {children}
         </ClientLayout>
+        <Toaster position="bottom-right" richColors />
       </body>
     </html>
   );

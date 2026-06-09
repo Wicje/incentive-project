@@ -23,10 +23,12 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
 
   // Close sidebar on mobile when navigating
   useEffect(() => {
-    if (isMobile && sidebarOpen) {
-      toggleSidebar();
+    if (window.innerWidth < 768) {
+      if (useStore.getState().sidebarOpen) {
+        useStore.getState().toggleSidebar();
+      }
     }
-  }, [pathname, isMobile, sidebarOpen, toggleSidebar]);
+  }, [pathname]);
 
   return (
     <div className="flex h-screen overflow-hidden w-full bg-white">

@@ -7,10 +7,13 @@ import { Plus, Folder, Calendar, Activity, Command, FileText, CheckCircle2, Circ
 import { Button } from '@/components/ui/button';
 import { useState } from 'react';
 import { Input } from '@/components/ui/input';
+import { useRouter } from 'next/navigation';
+import { toast } from 'sonner';
 
 import { PROJECT_TEMPLATES, MOODBOARD_TEMPLATES } from '@/lib/templates';
 
 export default function Dashboard() {
+  const router = useRouter();
   const { projects, logs, tasks, identity, addProject, addTask } = useStore();
   const [isCreating, setIsCreating] = useState(false);
   const [isCreatingTask, setIsCreatingTask] = useState(false);
@@ -65,6 +68,11 @@ export default function Dashboard() {
     
     setNewProject({ name: '', client: '', deadline: '', templateId: '' });
     setIsCreating(false);
+    toast.success('Workspace created successfully');
+    
+    if (newProjectId) {
+      router.push(`/projects/${newProjectId}`);
+    }
   };
 
   const handleCreateTask = async (e: React.FormEvent) => {
@@ -81,6 +89,7 @@ export default function Dashboard() {
     
     setNewTask({ title: '', projectId: '' });
     setIsCreatingTask(false);
+    toast.success('Task added successfully');
   };
 
   const activeTasks = tasks.filter(t => t.status !== 'done');

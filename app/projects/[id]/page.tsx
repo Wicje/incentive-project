@@ -8,6 +8,7 @@ import { ArrowLeft, CheckCircle2, Circle, Clock, MoreVertical, Eye, FileImage, T
 import { Button } from '@/components/ui/button';
 import Editor from '@/components/Editor';
 import { TaskStage, TaskStatus } from '@/types';
+import { toast } from 'sonner';
 
 export default function ProjectDetail() {
   const { id } = useParams() as { id: string };
@@ -137,7 +138,7 @@ ${pendingTasks.length > 0 ? pendingTasks.slice(0, 5).map(t => '☐ ' + t.title).
 Please let me know if you have any questions!`;
 
               await navigator.clipboard.writeText(report);
-              alert('Status Report copied to clipboard. You can paste this into an email to your client.');
+              toast.success('Status Report copied to clipboard.');
             }}
           >
             Copy Status Report
@@ -306,7 +307,7 @@ Your Agency`;
                           onClick={() => {
                             const imgHtml = `<img src="${asset.url}" alt="Asset" />`;
                             updateProjectCanvas(project.id, (project.canvasContent || '') + imgHtml);
-                            alert('Image added to canvas!');
+                            toast.success('Image added to canvas!');
                           }}
                           className="w-full text-left rounded-2xl overflow-hidden border border-stone-200 aspect-square block bg-stone-100 shadow-sm hover:shadow-md transition-shadow focus:outline-none focus:ring-2 focus:ring-stone-400"
                           title="Click to insert into Canvas"
