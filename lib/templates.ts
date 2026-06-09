@@ -104,36 +104,59 @@ export const PROJECT_TEMPLATES: ProjectTemplate[] = [
       { title: 'Final File Delivery Package', stageId: 'delivery' }
     ],
     canvasTemplate: `
-      <h2>1. Client Intake & Brief</h2>
+      <h1>Logo Architecture</h1>
+      <p>A standardized 15-step process for focused logo design and delivery.</p>
+      <hr>
+
+      <h2>Logo Concepting</h2>
+
+      <h3>Word Mapping</h3>
+      <p><em>Brainstorm key concepts, synonyms, and visual metaphors associated with the brand core identity.</em></p>
+      <ul>
+        <li>Trust</li>
+        <li>Speed</li>
+        <li>Innovation</li>
+        <li>Growth</li>
+        <li>Security</li>
+      </ul>
       <p><br></p>
-      <h2>2. Competitor Research</h2>
+
+      <h3>Mood Boards & Style Direction</h3>
+      <p><em>Compile references to establish the visual language before sketching.</em></p>
+      <p>[Insert Image References Here]</p>
       <p><br></p>
-      <h2>3. Target Audience Profile</h2>
+
+      <h2>Execution Guidelines</h2>
+
+      <h3>Typography Setup</h3>
+      <p><em>Primary and secondary font families for logotype and descriptor.</em></p>
+      <p><strong>Primary Serif:</strong> Playfair Display</p>
+      <p><strong>Secondary Sans:</strong> Inter</p>
       <p><br></p>
-      <h2>4. Brand Positioning Scales</h2>
+
+      <h3>Clear Space</h3>
+      <p><em>Define the minimum breathing room around the logo mark.</em></p>
+      <p>Minimum 1x height of the logomark symbol on all sides.</p>
       <p><br></p>
-      <h2>5. Style Direction — Mood Boards</h2>
-      <p><br></p>
-      <h2>6. Client Direction Lockup</h2>
-      <p><br></p>
-      <h2>7. Word Mapping & Brainstorm</h2>
-      <p><br></p>
-      <h2>8. Thumbnail Sketching</h2>
-      <p><br></p>
-      <h2>9. Vectorize Concepts</h2>
-      <p><br></p>
-      <h2>10. Typography Pairings Study</h2>
-      <p><br></p>
-      <h2>11. Color Palette System</h2>
-      <p><br></p>
-      <h2>12. Logo Matrix Variations</h2>
-      <p><br></p>
-      <h2>13. Clear Space Spacing Rules</h2>
-      <p><br></p>
-      <h2>14. Concept Deck Presentation</h2>
-      <p><br></p>
-      <h2>15. Final File Delivery Package</h2>
-      <p><br></p>
+
+      <h2>The 15-Step Process Checklist</h2>
+      <ul data-type="taskList">
+        <li data-type="taskItem" data-checked="false">1. Client Intake & Brief</li>
+        <li data-type="taskItem" data-checked="false">2. Competitor Research</li>
+        <li data-type="taskItem" data-checked="false">3. Target Audience Profile</li>
+        <li data-type="taskItem" data-checked="false">4. Brand Positioning Scales</li>
+        <li data-type="taskItem" data-checked="false">5. Style Direction — Mood Boards</li>
+        <li data-type="taskItem" data-checked="false">6. Client Direction Lockup</li>
+        <li data-type="taskItem" data-checked="false">7. Word Mapping & Brainstorm</li>
+        <li data-type="taskItem" data-checked="false">8. Thumbnail Sketching</li>
+        <li data-type="taskItem" data-checked="false">9. Vectorize Concepts</li>
+        <li data-type="taskItem" data-checked="false">10. Typography Pairings Study</li>
+        <li data-type="taskItem" data-checked="false">11. Color Palette System</li>
+        <li data-type="taskItem" data-checked="false">12. Logo Matrix Variations</li>
+        <li data-type="taskItem" data-checked="false">13. Clear Space Spacing Rules</li>
+        <li data-type="taskItem" data-checked="false">14. Concept Deck Presentation</li>
+        <li data-type="taskItem" data-checked="false">15. Final File Delivery Package</li>
+      </ul>
     `
   },
   {
@@ -172,50 +195,62 @@ export const PROJECT_TEMPLATES: ProjectTemplate[] = [
       { title: 'Final System Delivery', stageId: 'delivery' }
     ],
     canvasTemplate: `
-      <h2>1. Client Intake & Brief</h2>
+      <h1>Full Branding Architecture</h1>
+      <p>A standardized 22-step process for complete brand identity systems.</p>
+      <hr>
+      <h2>Brand Strategy</h2>
+      <h3>1. Vision Statement</h3>
+      <p><em>Your vision is your why and the long-term vision for your work. A vision statement is all about where you want to go.</em></p>
+      <p><strong>Write your vision statement:</strong></p>
+      <blockquote>Example — To be a leading freelance graphic designer recognized for my innovative designs that inspire and engage audiences...</blockquote>
       <p><br></p>
-      <h2>2. Competitor Research</h2>
+      <h3>2. Mission Statement</h3>
+      <p><em>Your mission is what you do and how you're going to do it. Focused on the present.</em></p>
+      <p><strong>Write your mission statement:</strong></p>
+      <blockquote>Example — I am committed to delivering high-quality design solutions that help my clients achieve their goals.</blockquote>
       <p><br></p>
-      <h2>3. Target Audience Profile</h2>
+      <h3>3. Brand Personality</h3>
+      <p><em>Brand personality is like the personality of a person, but for a brand.</em></p>
+      <p><strong>Write your brand values:</strong></p>
+      <ul>
+        <li>Innovative</li>
+        <li>Authentic</li>
+        <li>Creative</li>
+      </ul>
       <p><br></p>
-      <h2>4. Brand Positioning Scales</h2>
+      <h2>Visual Guide</h2>
+      <h3>Color Palette</h3>
+      <ul>
+        <li><strong>Primary 1:</strong> #EAD3D0</li>
+        <li><strong>Primary 2:</strong> #EBE2DC</li>
+        <li><strong>Secondary:</strong> #D6C0A6</li>
+      </ul>
       <p><br></p>
-      <h2>5. Style Direction — Mood Boards</h2>
-      <p><br></p>
-      <h2>6. Client Direction Lockup</h2>
-      <p><br></p>
-      <h2>7. Word Mapping & Brainstorm</h2>
-      <p><br></p>
-      <h2>8. Thumbnail Sketching</h2>
-      <p><br></p>
-      <h2>9. Vectorize Concepts</h2>
-      <p><br></p>
-      <h2>10. Typography Pairings Study</h2>
-      <p><br></p>
-      <h2>11. Color Palette System</h2>
-      <p><br></p>
-      <h2>12. Logo Matrix Variations</h2>
-      <p><br></p>
-      <h2>13. Clear Space Spacing Rules</h2>
-      <p><br></p>
-      <h2>14. Concept Deck Presentation</h2>
-      <p><br></p>
-      <h2>15. Final File Delivery Package</h2>
-      <p><br></p>
-      <h2>16. Brand Language & Voice</h2>
-      <p><br></p>
-      <h2>17. Photo Style Rules</h2>
-      <p><br></p>
-      <h2>18. Supporting Brand Assets</h2>
-      <p><br></p>
-      <h2>19. Full Identity Presentation</h2>
-      <p><br></p>
-      <h2>20. Branding Guidelines Manual</h2>
-      <p><br></p>
-      <h2>21. Collateral Applications</h2>
-      <p><br></p>
-      <h2>22. Final System Delivery</h2>
-      <p><br></p>
+      <h2>The 22-Step Process Checklist</h2>
+      <ul data-type="taskList">
+        <li data-type="taskItem" data-checked="false">1. Client Intake & Brief</li>
+        <li data-type="taskItem" data-checked="false">2. Competitor Research</li>
+        <li data-type="taskItem" data-checked="false">3. Target Audience Profile</li>
+        <li data-type="taskItem" data-checked="false">4. Brand Positioning Scales</li>
+        <li data-type="taskItem" data-checked="false">5. Style Direction — Mood Boards</li>
+        <li data-type="taskItem" data-checked="false">6. Client Direction Lockup</li>
+        <li data-type="taskItem" data-checked="false">7. Word Mapping & Brainstorm</li>
+        <li data-type="taskItem" data-checked="false">8. Thumbnail Sketching</li>
+        <li data-type="taskItem" data-checked="false">9. Vectorize Concepts</li>
+        <li data-type="taskItem" data-checked="false">10. Typography Pairings Study</li>
+        <li data-type="taskItem" data-checked="false">11. Color Palette System</li>
+        <li data-type="taskItem" data-checked="false">12. Logo Matrix Variations</li>
+        <li data-type="taskItem" data-checked="false">13. Clear Space Spacing Rules</li>
+        <li data-type="taskItem" data-checked="false">14. Concept Deck Presentation</li>
+        <li data-type="taskItem" data-checked="false">15. Final File Delivery Package</li>
+        <li data-type="taskItem" data-checked="false">16. Brand Language & Voice</li>
+        <li data-type="taskItem" data-checked="false">17. Photo Style Rules</li>
+        <li data-type="taskItem" data-checked="false">18. Supporting Brand Assets</li>
+        <li data-type="taskItem" data-checked="false">19. Full Identity Presentation</li>
+        <li data-type="taskItem" data-checked="false">20. Branding Guidelines Manual</li>
+        <li data-type="taskItem" data-checked="false">21. Collateral Applications</li>
+        <li data-type="taskItem" data-checked="false">22. Final System Delivery</li>
+      </ul>
     `
   },
   {

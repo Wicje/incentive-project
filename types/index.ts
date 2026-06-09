@@ -3,12 +3,14 @@ export type TaskStage = 'research' | 'moodboard' | 'design' | 'delivery';
 export type TaskStatus = 'todo' | 'in-progress' | 'done';
 
 export interface Identity {
+  uid: string;
   name: string;
   email: string;
 }
 
 export interface Project {
   id: string;
+  userId?: string;
   name: string;
   client: string;
   status: ProjectStatus;
@@ -22,6 +24,7 @@ export interface Project {
 
 export interface Task {
   id: string;
+  userId?: string;
   projectId: string;
   title: string;
   stage: TaskStage;
@@ -32,6 +35,7 @@ export interface Task {
 
 export interface Log {
   id: string;
+  userId?: string;
   projectId: string;
   action: string;
   details: string;
@@ -41,6 +45,7 @@ export interface Log {
 
 export interface Asset {
   id: string;
+  userId?: string;
   projectId: string;
   url: string;
   type: 'image' | 'video' | 'document';
@@ -49,6 +54,7 @@ export interface Asset {
 
 export interface Note {
   id: string;
+  userId?: string;
   title: string;
   content: string;
   createdAt: string;
@@ -64,6 +70,7 @@ export interface InvoiceItem {
 
 export interface Invoice {
   id: string;
+  userId?: string;
   projectId: string; // can be empty for standalone
   clientName: string;
   clientEmail: string;
@@ -76,6 +83,7 @@ export interface Invoice {
 
 export interface Resource {
   id: string;
+  userId?: string;
   title: string;
   url: string;
   category: string;

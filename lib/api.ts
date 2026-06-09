@@ -1,31 +1,41 @@
 import { Project, Task, Log, Asset, Note, Invoice, Resource } from '@/types';
 import { db } from './firebase';
-import { doc, setDoc, deleteDoc, collection, getDocs } from 'firebase/firestore';
+import { doc, setDoc, deleteDoc, collection, getDocs, query, where, limit } from 'firebase/firestore';
 
-export async function fetchAllData() {
+export async function fetchAllData(userId: string | undefined) {
   const result: any = {
     projects: [], tasks: [], logs: [], assets: [], notes: [], invoices: [], resources: []
   };
+  
+  if (!userId) return result;
+
   try {
-    const pSnap = await getDocs(collection(db, 'projects'));
+    const qProjects = query(collection(db, 'projects'), where('userId', '==', userId), limit(500));
+    const pSnap = await getDocs(qProjects);
     pSnap.forEach(d => result.projects.push(d.data()));
     
-    const tSnap = await getDocs(collection(db, 'tasks'));
+    const qTasks = query(collection(db, 'tasks'), where('userId', '==', userId), limit(1000));
+    const tSnap = await getDocs(qTasks);
     tSnap.forEach(d => result.tasks.push(d.data()));
 
-    const lSnap = await getDocs(collection(db, 'logs'));
+    const qLogs = query(collection(db, 'logs'), where('userId', '==', userId), limit(1000));
+    const lSnap = await getDocs(qLogs);
     lSnap.forEach(d => result.logs.push(d.data()));
     
-    const aSnap = await getDocs(collection(db, 'assets'));
+    const qAssets = query(collection(db, 'assets'), where('userId', '==', userId), limit(500));
+    const aSnap = await getDocs(qAssets);
     aSnap.forEach(d => result.assets.push(d.data()));
 
-    const nSnap = await getDocs(collection(db, 'notes'));
+    const qNotes = query(collection(db, 'notes'), where('userId', '==', userId), limit(500));
+    const nSnap = await getDocs(qNotes);
     nSnap.forEach(d => result.notes.push(d.data()));
 
-    const iSnap = await getDocs(collection(db, 'invoices'));
+    const qInvoices = query(collection(db, 'invoices'), where('userId', '==', userId), limit(500));
+    const iSnap = await getDocs(qInvoices);
     iSnap.forEach(d => result.invoices.push(d.data()));
 
-    const rSnap = await getDocs(collection(db, 'resources'));
+    const qResources = query(collection(db, 'resources'), where('userId', '==', userId), limit(500));
+    const rSnap = await getDocs(qResources);
     rSnap.forEach(d => result.resources.push(d.data()));
   } catch (err) {
     console.error('Failed to fetch from Firebase', err);

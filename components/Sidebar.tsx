@@ -20,6 +20,7 @@ export default function Sidebar({ className, isMobileView, onClose }: { classNam
 
   const navItems = [
     { name: 'Workspace', href: '/', icon: LayoutDashboard },
+    { name: 'Templates', href: '/templates', icon: Target },
     { name: 'Inbox', href: '/inbox', icon: Command },
     { name: 'Pipeline', href: '/pipeline', icon: Folder },
     { name: 'Calendar', href: '/calendar', icon: Calendar },

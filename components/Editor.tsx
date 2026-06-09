@@ -4,6 +4,8 @@ import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Image from '@tiptap/extension-image';
 import Link from '@tiptap/extension-link';
+import TaskItem from '@tiptap/extension-task-item';
+import TaskList from '@tiptap/extension-task-list';
 import { uploadToCloudinary } from '@/lib/api';
 import { useCallback, useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
@@ -38,6 +40,10 @@ export default function Editor({
     extensions: [
       StarterKit,
       Image,
+      TaskList,
+      TaskItem.configure({
+        nested: true,
+      }),
       Link.configure({
         openOnClick: false,
       }),

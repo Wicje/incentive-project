@@ -73,6 +73,7 @@ export const useStore = create<AgencyState>()(
         const newProject: Project = {
           ...projectData,
           id: crypto.randomUUID(),
+          userId: identity.uid,
           createdAt: new Date().toISOString(),
         };
 
@@ -114,9 +115,11 @@ export const useStore = create<AgencyState>()(
       },
 
       addTask: async (taskData) => {
+        const { identity } = get();
         const newTask: Task = {
           ...taskData,
           id: crypto.randomUUID(),
+          userId: identity?.uid,
           createdAt: new Date().toISOString(),
         };
         
@@ -141,8 +144,10 @@ export const useStore = create<AgencyState>()(
       },
 
       addAsset: async (projectId, url, type) => {
+        const { identity } = get();
         const newAsset: Asset = {
           id: crypto.randomUUID(),
+          userId: identity?.uid,
           projectId,
           url,
           type,
@@ -159,9 +164,11 @@ export const useStore = create<AgencyState>()(
       },
 
       addNote: async (noteData) => {
+        const { identity } = get();
         const newNote: Note = {
           ...noteData,
           id: crypto.randomUUID(),
+          userId: identity?.uid,
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
         };
@@ -187,9 +194,11 @@ export const useStore = create<AgencyState>()(
       },
 
       addInvoice: async (invoiceData) => {
+        const { identity } = get();
         const newInvoice: Invoice = {
           ...invoiceData,
           id: crypto.randomUUID(),
+          userId: identity?.uid,
           createdAt: new Date().toISOString(),
         };
         await api.syncInvoice(newInvoice);
@@ -208,9 +217,11 @@ export const useStore = create<AgencyState>()(
       },
 
       addResource: async (resourceData) => {
+        const { identity } = get();
         const newResource: Resource = {
           ...resourceData,
           id: crypto.randomUUID(),
+          userId: identity?.uid,
           createdAt: new Date().toISOString(),
         };
         await api.syncResource(newResource);
@@ -231,6 +242,7 @@ export const useStore = create<AgencyState>()(
 
         const newLog: Log = {
           id: crypto.randomUUID(),
+          userId: identity.uid,
           projectId,
           action,
           details,
@@ -247,7 +259,9 @@ export const useStore = create<AgencyState>()(
       },
 
       initFromFirebase: async () => {
-        const data = await api.fetchAllData();
+        const { identity } = get();
+        if (!identity?.uid) return;
+        const data = await api.fetchAllData(identity.uid);
         set((state) => ({
           projects: data.projects.length ? data.projects : state.projects,
           tasks: data.tasks.length ? data.tasks : state.tasks,
