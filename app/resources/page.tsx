@@ -7,13 +7,15 @@ import { Link2, Plus, Type, Trash2, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 export default function ResourcesPage() {
-  const { resources, addResource, deleteResource } = useStore();
+  const { resources: allResources, addResource, deleteResource } = useStore();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);
   }, []);
+
+  const resources = allResources.filter(r => !r.projectId);
 
   const [isCreating, setIsCreating] = useState(false);
   const [newResource, setNewResource] = useState({ title: '', url: '', category: '' });

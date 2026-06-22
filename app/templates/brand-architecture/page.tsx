@@ -79,7 +79,7 @@ export default function BrandArchitectureTemplate() {
                 <div>
                   <h3 className="text-lg font-bold font-sans text-stone-900 mb-2">2. Mission Statement</h3>
                   <p className="text-[13px] text-stone-600 mb-4 italic">
-                    Your mission is what you do and how you're going to do it. Focused on the present.
+                    Your mission is what you do and how you&apos;re going to do it. Focused on the present.
                   </p>
                   <textarea 
                     className="w-full bg-[#F5F5F3] p-4 rounded text-[14px] text-stone-800 font-medium border-l-2 border-stone-400 focus:outline-none focus:ring-1 focus:ring-stone-300 resize-none h-32"
@@ -92,7 +92,7 @@ export default function BrandArchitectureTemplate() {
               <div className="mb-8">
                 <h3 className="text-lg font-bold font-sans text-stone-900 mb-2">3. Brand personality</h3>
                 <p className="text-[13px] text-stone-600 mb-4 italic">
-                  Brand personality is like the personality of a person, but for a brand. It's the set of human characteristics that are attributed to a brand.
+                  Brand personality is like the personality of a person, but for a brand. It&apos;s the set of human characteristics that are attributed to a brand.
                 </p>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                   <textarea 

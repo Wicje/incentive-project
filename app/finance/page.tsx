@@ -3,11 +3,11 @@
 import { useStore } from '@/lib/store';
 import { useState, useEffect } from 'react';
 import { format } from 'date-fns';
-import { FileText, Plus, CheckCircle2, Circle } from 'lucide-react';
+import { FileText, Plus, CheckCircle2, Circle, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 export default function FinancePage() {
-  const { invoices, addInvoice, updateInvoice, projects } = useStore();
+  const { invoices, addInvoice, updateInvoice, deleteInvoice, projects } = useStore();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -74,7 +74,7 @@ export default function FinancePage() {
               <input required type="email" className="w-full border border-stone-200 rounded-md h-11 px-3 text-sm focus:ring-1 focus:ring-stone-400 focus:outline-none" value={newInvoice.clientEmail} onChange={e => setNewInvoice({...newInvoice, clientEmail: e.target.value})} />
             </div>
             <div className="space-y-2">
-              <label className="text-xs font-semibold uppercase tracking-wider text-stone-500">Amount ($)</label>
+              <label className="text-xs font-semibold uppercase tracking-wider text-stone-500">Amount (₦)</label>
               <input required type="number" min="0" step="0.01" className="w-full border border-stone-200 rounded-md h-11 px-3 text-sm focus:ring-1 focus:ring-stone-400 focus:outline-none" value={newInvoice.amount} onChange={e => setNewInvoice({...newInvoice, amount: e.target.value})} />
             </div>
             <div className="space-y-2">
@@ -118,14 +118,14 @@ export default function FinancePage() {
                     {invoice.clientName}
                     <div className="text-xs text-stone-400 font-normal">{invoice.clientEmail}</div>
                   </td>
-                  <td className="px-6 py-4 font-medium text-stone-700">${invoice.amount.toFixed(2)}</td>
+                  <td className="px-6 py-4 font-medium text-stone-700">₦{invoice.amount.toFixed(2)}</td>
                   <td className="px-6 py-4">
                     <span className={`px-2.5 py-1 rounded text-[10px] font-bold uppercase tracking-wider border ${getStatusColor(invoice.status)}`}>
                       {invoice.status}
                     </span>
                   </td>
                   <td className="px-6 py-4 text-stone-500 font-mono text-xs">{format(new Date(invoice.dueDate), 'MMM d, yyyy')}</td>
-                  <td className="px-6 py-4">
+                  <td className="px-6 py-4 flex items-center gap-2">
                     <select 
                       className="text-xs border-stone-200 rounded bg-white text-stone-600 focus:ring-1 focus:ring-stone-400"
                       value={invoice.status}
@@ -135,6 +135,13 @@ export default function FinancePage() {
                       <option value="sent">Sent</option>
                       <option value="paid">Paid</option>
                     </select>
+                    <button
+                      onClick={() => confirm('Delete this invoice?') && deleteInvoice(invoice.id)}
+                      className="p-1.5 text-stone-400 hover:text-red-600 hover:bg-stone-100 rounded transition-colors"
+                      title="Delete Invoice"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
                   </td>
                 </tr>
               ))}
