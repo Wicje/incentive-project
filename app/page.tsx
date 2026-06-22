@@ -29,6 +29,7 @@ export default function Dashboard() {
 
     let canvasTemplate = '';
     let defaultTasks: any[] = [];
+    let defaultResources: any[] = [];
     if (newProject.templateId) {
       const selected = MOODBOARD_TEMPLATES.find(t => t.id === newProject.templateId) || PROJECT_TEMPLATES.find(t => t.id === newProject.templateId) || customTemplates.find(t => t.id === newProject.templateId);
       if (selected && 'content' in selected) {
@@ -40,6 +41,12 @@ export default function Dashboard() {
       const projectSelected = PROJECT_TEMPLATES.find(t => t.id === newProject.templateId);
       if (projectSelected && projectSelected.defaultTasks) {
         defaultTasks = projectSelected.defaultTasks;
+      }
+      
+      const customSelected = customTemplates.find(t => t.id === newProject.templateId);
+      if (customSelected) {
+        if (customSelected.defaultTasks) defaultTasks = [...defaultTasks, ...customSelected.defaultTasks];
+        if (customSelected.defaultResources) defaultResources = customSelected.defaultResources;
       }
     }
 
@@ -60,9 +67,22 @@ export default function Dashboard() {
         await addTask({
           projectId: newProjectId,
           title: t.title,
-          stage: t.stageId as any,
+          stage: (t.stage || 'research') as any,
           status: 'todo',
-          dueDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString(),
+          dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString()
+        });
+      }
+    }
+
+    // Add default resources from custom template
+    if (newProjectId && defaultResources.length > 0) {
+      const { addResource } = useStore.getState();
+      for (const r of defaultResources) {
+        addResource({
+          projectId: newProjectId,
+          title: r.title,
+          url: r.url,
+          category: r.category
         });
       }
     }

@@ -8,6 +8,8 @@ export interface PartialTemplate {
   name: string;
   description: string;
   canvasTemplate: string;
+  defaultTasks?: { title: string; stage: string }[];
+  defaultResources?: { title: string; url: string; category: string }[];
 }
 
 interface AgencyState {

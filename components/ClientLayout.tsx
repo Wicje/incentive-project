@@ -31,10 +31,10 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
   }, [pathname]);
 
   return (
-    <div className="flex h-screen overflow-hidden w-full bg-white">
+    <div className="flex h-screen overflow-hidden w-full">
       {/* Desktop Sidebar */}
       {sidebarOpen && !isMobile && (
-        <Sidebar className="hidden md:flex w-64 flex-col border-r border-[#EFEFEF] bg-[#F7F7F5] shrink-0 z-40 transition-all duration-300" />
+        <Sidebar className="hidden md:flex w-64 flex-col border-r border-[#EFEFEF] dark:border-stone-800 bg-brand-surface shrink-0 z-40 transition-all duration-300" />
       )}
       
       {/* Mobile Sidebar Backdrop */}
@@ -47,26 +47,26 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
 
       {/* Mobile Sidebar */}
       <div 
-        className={`md:hidden fixed inset-y-0 left-0 z-50 w-72 bg-[#F7F7F5] transform transition-transform duration-300 ease-in-out shadow-2xl ${sidebarOpen && isMobile ? 'translate-x-0' : '-translate-x-full'}`}
+        className={`md:hidden fixed inset-y-0 left-0 z-50 w-72 bg-brand-surface transform transition-transform duration-300 ease-in-out shadow-2xl ${sidebarOpen && isMobile ? 'translate-x-0' : '-translate-x-full'}`}
       >
-        <Sidebar className="flex h-full w-full flex-col border-r border-[#EFEFEF]" isMobileView={true} onClose={toggleSidebar} />
+        <Sidebar className="flex h-full w-full flex-col border-r border-[#EFEFEF] dark:border-stone-800" isMobileView={true} onClose={toggleSidebar} />
       </div>
 
       <div className="flex-1 w-full relative flex flex-col min-w-0">
         
         {/* Mobile Header Bar */}
-        <div className="md:hidden flex items-center h-14 border-b border-[#EFEFEF] bg-[#F7F7F5]/95 backdrop-blur px-4 shrink-0 z-20 relative">
+        <div className="md:hidden flex items-center h-14 border-b border-[#EFEFEF] dark:border-stone-800 bg-brand-surface/95 backdrop-blur px-4 shrink-0 z-20 relative">
           <Button variant="ghost" size="icon" onClick={toggleSidebar} className="mr-3 -ml-2 text-stone-600 hover:bg-stone-200">
             <Menu className="w-5 h-5" />
           </Button>
-          <span className="font-sans font-bold text-lg text-stone-900 truncate tracking-tight">WISCODE</span>
+          <span className="font-sans font-bold text-lg text-stone-900 dark:text-stone-100 truncate tracking-tight">WISCODE</span>
         </div>
 
         {/* Main Scrolling Content Area */}
         <div className="flex-1 overflow-y-auto w-full relative flex flex-col">
           {!sidebarOpen && (
             <div className="absolute top-4 left-4 z-30 hidden md:block">
-              <Button variant="outline" size="icon" onClick={toggleSidebar} className="bg-white/80 backdrop-blur-md shadow-sm border-[#EFEFEF] hover:bg-stone-100 text-stone-600">
+              <Button variant="outline" size="icon" onClick={toggleSidebar} className="bg-brand-surface/80 backdrop-blur-md shadow-sm border-[#EFEFEF] dark:border-stone-800 hover:bg-stone-100 text-stone-600">
                 <Menu className="w-4 h-4" />
               </Button>
             </div>

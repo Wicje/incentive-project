@@ -13,8 +13,9 @@ import { toast } from 'sonner';
 export default function ProjectDetail() {
   const { id } = useParams() as { id: string };
   const router = useRouter();
-  const { projects, tasks, addTask, updateTask, updateProjectCanvas, addAsset, assets, deleteProject, resources, addResource, deleteResource } = useStore();
+  const { projects, tasks, addTask, updateTask, updateProjectCanvas, addAsset, assets, deleteProject, resources, addResource, deleteResource, addCustomTemplate } = useStore();
   const [mounted, setMounted] = useState(false);
+  const [isClientView, setIsClientView] = useState(false);
   
   const project = projects.find(p => p.id === id);
   const projectTasks = tasks.filter(t => t.projectId === id);
@@ -47,7 +48,26 @@ export default function ProjectDetail() {
     setIsCreatingResource(false);
   };
 
+  const handleSaveAsTemplate = () => {
+    if (!project) return;
+    addCustomTemplate({
+      id: `custom-tpl-${Date.now()}`,
+      name: `${project.name} Template`,
+      description: `Extracted from ${project.name}`,
+      canvasTemplate: project.canvasContent,
+      defaultTasks: projectTasks.map(t => ({ title: t.title, stage: t.stage })),
+      defaultResources: projectResources.map(r => ({ title: r.title, url: r.url, category: r.category }))
+    });
+    toast.success('Project saved as a custom reusable template.');
+  };
+
   useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get('client-view') === 'true') {
+        setIsClientView(true);
+      }
+    }
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);
   }, []);
@@ -132,49 +152,59 @@ export default function ProjectDetail() {
         </div>
         
         <div className="flex items-center gap-3">
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            className="text-stone-400 hover:text-red-600 hover:bg-red-50"
-            onClick={() => setIsDeleteDialogOpen(true)}
-          >
-            <Trash2 className="w-4 h-4" />
-          </Button>
-          <Button 
-            variant="outline" 
-            size="sm" 
-            className="border-stone-200 text-stone-600 hover:bg-stone-100"
-            onClick={async () => {
-              const completedTasks = projectTasks.filter(t => t.status === 'done');
-              const pendingTasks = projectTasks.filter(t => t.status !== 'done');
-              const report = `Project Update: ${project.name}
+          {!isClientView && (
+            <>
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                className="text-stone-400 hover:text-red-600 hover:bg-red-50"
+                onClick={() => setIsDeleteDialogOpen(true)}
+              >
+                <Trash2 className="w-4 h-4" />
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                className="border-stone-200 text-stone-600 hover:bg-stone-100"
+                onClick={handleSaveAsTemplate}
+              >
+                Save as Template
+              </Button>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="border-stone-200 text-stone-600 hover:bg-stone-100"
+                onClick={async () => {
+                  const completedTasks = projectTasks.filter(t => t.status === 'done');
+                  const pendingTasks = projectTasks.filter(t => t.status !== 'done');
+                  const report = `Project Update: ${project.name}
 Client: ${project.client}
 Status: ${project.status.toUpperCase()}
 
 COMPLETED RECENTLY:
-${completedTasks.length > 0 ? completedTasks.map(t => '✓ ' + t.title).join('\\n') : 'No completed tasks yet.'}
+${completedTasks.length > 0 ? completedTasks.map(t => '✓ ' + t.title).join('\n') : 'No completed tasks yet.'}
 
 UPCOMING:
-${pendingTasks.length > 0 ? pendingTasks.slice(0, 5).map(t => '☐ ' + t.title).join('\\n') : 'No pending tasks.'}
+${pendingTasks.length > 0 ? pendingTasks.slice(0, 5).map(t => '☐ ' + t.title).join('\n') : 'No pending tasks.'}
 
 Please let me know if you have any questions!`;
 
-              await navigator.clipboard.writeText(report);
-              toast.success('Status Report copied to clipboard.');
-            }}
-          >
-            Copy Status Report
-          </Button>
-          <Button 
-            variant="default" 
-            size="sm" 
-            className="bg-stone-900 text-white hover:bg-stone-800"
-            onClick={() => {
-              const url = window.location.origin;
-              const subject = `Project Update: ${project.name}`;
-              const completedTasks = projectTasks.filter(t => t.status === 'done');
-              const pendingTasks = projectTasks.filter(t => t.status !== 'done');
-              const body = `Hi ${project.client},
+                  await navigator.clipboard.writeText(report);
+                  toast.success('Status Report copied to clipboard.');
+                }}
+              >
+                Copy Status Report
+              </Button>
+              <Button 
+                variant="default" 
+                size="sm" 
+                className="bg-stone-900 text-white hover:bg-stone-800"
+                onClick={() => {
+                  const url = window.location.origin;
+                  const subject = `Project Update: ${project.name}`;
+                  const completedTasks = projectTasks.filter(t => t.status === 'done');
+                  const pendingTasks = projectTasks.filter(t => t.status !== 'done');
+                  const body = `Hi ${project.client},
 
 Here is the latest update for your project:
 
@@ -188,11 +218,13 @@ ${pendingTasks.length > 0 ? pendingTasks.slice(0, 5).map(t => '☐ ' + t.title).
 
 Best,
 Your Agency`;
-              window.location.assign(`mailto:?subject=${encodeURIComponent(subject)}&body=${body}`);
-            }}
-          >
-            Draft Email Update
-          </Button>
+                  window.location.assign(`mailto:?subject=${encodeURIComponent(subject)}&body=${body}`);
+                }}
+              >
+                Draft Email Update
+              </Button>
+            </>
+          )}
         </div>
       </header>
 
@@ -224,6 +256,7 @@ Your Agency`;
                 <Editor 
                   initialContent={project.canvasContent || ''} 
                   onChange={(html) => updateProjectCanvas(project.id, html)} 
+                  readOnly={isClientView}
                 />
               </div>
             </div>
@@ -244,16 +277,22 @@ Your Agency`;
                     <div className="space-y-2.5">
                       {stageTasks.map(task => (
                         <div key={task.id} className="bg-white p-3 rounded-lg shadow-[0_1px_2px_rgba(0,0,0,0.05)] border border-stone-200/60 flex items-start gap-2 group">
-                          <button 
-                            className="mt-[3px] text-stone-300 group-hover:text-stone-500 transition-colors"
-                            onClick={() => toggleTaskStatus(task.id, task.status)}
-                          >
-                            {task.status === 'done' ? (
-                              <CheckCircle2 className="w-[18px] h-[18px] text-stone-900" />
-                            ) : (
-                              <Circle className="w-[18px] h-[18px]" />
-                            )}
-                          </button>
+                          {isClientView ? (
+                            <div className="mt-[3px] text-stone-300">
+                              {task.status === 'done' ? <CheckCircle2 className="w-[18px] h-[18px] text-stone-900" /> : <Circle className="w-[18px] h-[18px]" />}
+                            </div>
+                          ) : (
+                            <button 
+                              className="mt-[3px] text-stone-300 group-hover:text-stone-500 transition-colors"
+                              onClick={() => toggleTaskStatus(task.id, task.status)}
+                            >
+                              {task.status === 'done' ? (
+                                <CheckCircle2 className="w-[18px] h-[18px] text-stone-900" />
+                              ) : (
+                                <Circle className="w-[18px] h-[18px]" />
+                              )}
+                            </button>
+                          )}
                           <div className="flex-1">
                             <p className={`text-[13px] font-medium leading-normal ${task.status === 'done' ? 'line-through text-stone-400' : 'text-stone-800'}`}>
                               {task.title}
@@ -262,17 +301,19 @@ Your Agency`;
                         </div>
                       ))}
 
-                      <form 
-                        onSubmit={(e) => handleAddTask(e, stage.id)}
-                        className="mt-2"
-                      >
-                        <input 
-                          type="text" 
-                          name="title"
-                          placeholder="Add a task..." 
-                          className="w-full bg-white text-[13px] border border-stone-200/60 rounded-lg px-3 py-2.5 focus:outline-none focus:ring-1 focus:ring-stone-400 focus:border-stone-400 shadow-sm transition-all text-stone-700 placeholder:text-stone-400"
-                        />
-                      </form>
+                      {!isClientView && (
+                        <form 
+                          onSubmit={(e) => handleAddTask(e, stage.id)}
+                          className="mt-2"
+                        >
+                          <input 
+                            type="text" 
+                            name="title"
+                            placeholder="Add a task..." 
+                            className="w-full bg-white text-[13px] border border-stone-200/60 rounded-lg px-3 py-2.5 focus:outline-none focus:ring-1 focus:ring-stone-400 focus:border-stone-400 shadow-sm transition-all text-stone-700 placeholder:text-stone-400"
+                          />
+                        </form>
+                      )}
                     </div>
                   </div>
                 );
@@ -288,30 +329,32 @@ Your Agency`;
                   <h3 className="font-semibold text-stone-900 text-base mb-1">Files & Media</h3>
                   <p className="text-sm text-stone-500">Click on any asset to insert it directly into the canvas.</p>
                 </div>
-                <div className="flex gap-4">
-                  <div className="relative">
-                    <input 
-                      type="file" 
-                      className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                      accept="image/*"
-                      onChange={async (e) => {
-                        const file = e.target.files?.[0];
-                        if (file) {
-                          try {
-                            const { uploadToCloudinary } = await import('@/lib/api');
-                            const url = await uploadToCloudinary(file);
-                            await addAsset(project.id, url, 'image');
-                          } catch (err: any) {
-                            alert(err.message || 'Upload failed');
+                {!isClientView && (
+                  <div className="flex gap-4">
+                    <div className="relative">
+                      <input 
+                        type="file" 
+                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                        accept="image/*"
+                        onChange={async (e) => {
+                          const file = e.target.files?.[0];
+                          if (file) {
+                            try {
+                              const { uploadToCloudinary } = await import('@/lib/api');
+                              const url = await uploadToCloudinary(file);
+                              await addAsset(project.id, url, 'image');
+                            } catch (err: any) {
+                              alert(err.message || 'Upload failed');
+                            }
                           }
-                        }
-                      }}
-                    />
-                    <Button variant="outline" className="border-stone-200 shadow-sm text-stone-700 hover:bg-stone-50">
-                      Upload File
-                    </Button>
+                        }}
+                      />
+                      <Button variant="outline" className="border-stone-200 shadow-sm text-stone-700 hover:bg-stone-50">
+                        Upload File
+                      </Button>
+                    </div>
                   </div>
-                </div>
+                )}
               </div>
 
               {assets.length === 0 ? (
@@ -358,9 +401,11 @@ Your Agency`;
                   <h3 className="font-semibold text-stone-900 text-base mb-1">Resource Library</h3>
                   <p className="text-sm text-stone-500">Links, documents, and reference materials for this project.</p>
                 </div>
-                <Button onClick={() => setIsCreatingResource(!isCreatingResource)} variant="outline" className="border-stone-200 shadow-sm text-stone-700 hover:bg-stone-50">
-                  <Plus className="w-4 h-4 mr-2" /> Add Link
-                </Button>
+                {!isClientView && (
+                  <Button onClick={() => setIsCreatingResource(!isCreatingResource)} variant="outline" className="border-stone-200 shadow-sm text-stone-700 hover:bg-stone-50">
+                    <Plus className="w-4 h-4 mr-2" /> Add Link
+                  </Button>
+                )}
               </div>
 
               {isCreatingResource && (

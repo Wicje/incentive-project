@@ -30,7 +30,7 @@ import { Toaster } from 'sonner';
 export default function RootLayout({children}: {children: React.ReactNode}) {
   return (
     <html lang="en" suppressHydrationWarning className={`${inter.variable} ${jetbrainsMono.variable} ${spaceGrotesk.variable}`}>
-      <body className="bg-white dark:bg-stone-950 text-stone-900 dark:text-stone-100 font-sans antialiased flex h-screen overflow-hidden transition-colors" suppressHydrationWarning>
+      <body className="text-stone-900 dark:text-stone-100 font-sans antialiased flex h-screen overflow-hidden transition-colors" suppressHydrationWarning>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <ClientLayout>
             <IdentityModal />
