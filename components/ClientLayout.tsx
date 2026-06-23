@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { useFirebaseSync } from '@/hooks/useFirebaseSync';
 import { useEffect, useState } from 'react';
 import { usePathname } from 'next/navigation';
+import { CommandPalette } from '@/components/CommandPalette';
 
 export default function ClientLayout({ children }: { children: React.ReactNode }) {
   const { sidebarOpen, toggleSidebar } = useStore();
@@ -74,6 +75,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
           {children}
         </div>
       </div>
+      <CommandPalette />
     </div>
   );
 }
