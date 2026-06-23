@@ -4,7 +4,6 @@ import Sidebar from '@/components/Sidebar';
 import { useStore } from '@/lib/store';
 import { Menu } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useFirebaseSync } from '@/hooks/useFirebaseSync';
 import { useEffect, useState } from 'react';
 import { usePathname } from 'next/navigation';
 
@@ -12,7 +11,6 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
   const { sidebarOpen, toggleSidebar } = useStore();
   const [isMobile, setIsMobile] = useState(false);
   const pathname = usePathname();
-  useFirebaseSync();
 
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth < 768);
