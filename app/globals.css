@@ -1,28 +1,6 @@
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
 
-@theme {
-  --color-brand-bg: var(--bg-primary);
-  --color-brand-surface: var(--bg-secondary);
-  --color-brand-accent: var(--accent);
-}
-
-:root {
-  --bg-primary: #e5e5e5;
-  --bg-secondary: #f4f4f4;
-  --accent: #2F4560;
-}
-
-.dark {
-  --bg-primary: #242E3D;
-  --bg-secondary: #37818D;
-  --accent: #66FFCC;
-}
-
-body {
-  background-color: var(--color-brand-bg);
-}
-
 ul[data-type="taskList"] {
   list-style: none;
   padding: 0;

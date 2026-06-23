@@ -14,10 +14,9 @@ import { PROJECT_TEMPLATES, MOODBOARD_TEMPLATES } from '@/lib/templates';
 
 export default function Dashboard() {
   const router = useRouter();
-  const { projects, logs, tasks, identity, addProject, addTask, customTemplates } = useStore();
+  const { projects, logs, tasks, identity, addProject, addTask } = useStore();
   const [isCreating, setIsCreating] = useState(false);
   const [isCreatingTask, setIsCreatingTask] = useState(false);
-  const [projectTab, setProjectTab] = useState<'all' | 'recent'>('all');
   const [newTask, setNewTask] = useState({ title: '', projectId: '' });
   const [newProject, setNewProject] = useState({ name: '', client: '', deadline: '', templateId: '' });
 
@@ -29,9 +28,8 @@ export default function Dashboard() {
 
     let canvasTemplate = '';
     let defaultTasks: any[] = [];
-    let defaultResources: any[] = [];
     if (newProject.templateId) {
-      const selected = MOODBOARD_TEMPLATES.find(t => t.id === newProject.templateId) || PROJECT_TEMPLATES.find(t => t.id === newProject.templateId) || customTemplates.find(t => t.id === newProject.templateId);
+      const selected = MOODBOARD_TEMPLATES.find(t => t.id === newProject.templateId) || PROJECT_TEMPLATES.find(t => t.id === newProject.templateId);
       if (selected && 'content' in selected) {
         canvasTemplate = selected.content;
       } else if (selected && 'canvasTemplate' in selected) {
@@ -41,12 +39,6 @@ export default function Dashboard() {
       const projectSelected = PROJECT_TEMPLATES.find(t => t.id === newProject.templateId);
       if (projectSelected && projectSelected.defaultTasks) {
         defaultTasks = projectSelected.defaultTasks;
-      }
-      
-      const customSelected = customTemplates.find(t => t.id === newProject.templateId);
-      if (customSelected) {
-        if (customSelected.defaultTasks) defaultTasks = [...defaultTasks, ...customSelected.defaultTasks];
-        if (customSelected.defaultResources) defaultResources = customSelected.defaultResources;
       }
     }
 
@@ -67,22 +59,9 @@ export default function Dashboard() {
         await addTask({
           projectId: newProjectId,
           title: t.title,
-          stage: (t.stage || 'research') as any,
+          stage: t.stageId as any,
           status: 'todo',
-          dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString()
-        });
-      }
-    }
-
-    // Add default resources from custom template
-    if (newProjectId && defaultResources.length > 0) {
-      const { addResource } = useStore.getState();
-      for (const r of defaultResources) {
-        addResource({
-          projectId: newProjectId,
-          title: r.title,
-          url: r.url,
-          category: r.category
+          dueDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString(),
         });
       }
     }
@@ -100,10 +79,8 @@ export default function Dashboard() {
     e.preventDefault();
     if (!newTask.title || !newTask.projectId) return;
 
-    const targetProjectId = newTask.projectId;
-
     await addTask({
-      projectId: targetProjectId,
+      projectId: newTask.projectId,
       title: newTask.title,
       stage: 'research',
       status: 'todo',
@@ -113,8 +90,6 @@ export default function Dashboard() {
     setNewTask({ title: '', projectId: '' });
     setIsCreatingTask(false);
     toast.success('Task added successfully');
-    
-    router.push(`/projects/${targetProjectId}`);
   };
 
   const activeTasks = tasks.filter(t => t.status !== 'done');
@@ -124,7 +99,7 @@ export default function Dashboard() {
       
       <header className="pt-8 pb-10 flex flex-col items-start justify-center gap-2">
         <h1 className="text-[32px] sm:text-[36px] font-sans font-bold tracking-tight text-stone-900 leading-tight">Good {new Date().getHours() < 12 ? 'morning' : new Date().getHours() < 18 ? 'afternoon' : 'evening'}, {identity.name.split(' ')[0]}</h1>
-        <p className="text-stone-500 font-medium text-[15px]">Here&apos;s what&apos;s happening in your workspace today.</p>
+        <p className="text-stone-500 font-medium text-[15px]">Here's what's happening in your workspace today.</p>
       </header>
 
       {/* Navigation / Domains Bento Grid */}
@@ -205,11 +180,6 @@ export default function Dashboard() {
                 className="flex h-11 w-full rounded-md border border-stone-200 bg-stone-50 px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-stone-400 disabled:cursor-not-allowed disabled:opacity-50 text-stone-900"
               >
                 <option value="">Blank Workspace</option>
-                {customTemplates.length > 0 && (
-                  <optgroup label="Custom">
-                    {customTemplates.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
-                  </optgroup>
-                )}
                 <optgroup label="Agency">
                   {PROJECT_TEMPLATES.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
                 </optgroup>
@@ -283,27 +253,11 @@ export default function Dashboard() {
         
         {/* Active Projects Container */}
         <section className="lg:col-span-8 space-y-4">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between px-1 gap-4">
-            <div className="flex items-center gap-6">
-              <h2 className="text-[14px] font-medium tracking-tight text-stone-500 flex items-center gap-2">
-                <Folder className="w-4 h-4 text-stone-400" />
-                Projects
-              </h2>
-              <div className="flex items-center gap-4 text-[13px] font-medium">
-                <button 
-                  onClick={() => setProjectTab('all')}
-                  className={`transition-colors ${projectTab === 'all' ? 'text-stone-900 border-b border-stone-900' : 'text-stone-400 hover:text-stone-600'}`}
-                >
-                  All Projects
-                </button>
-                <button 
-                  onClick={() => setProjectTab('recent')}
-                  className={`transition-colors flex items-center gap-1.5 ${projectTab === 'recent' ? 'text-stone-900 border-b border-stone-900' : 'text-stone-400 hover:text-stone-600'}`}
-                >
-                  Recent
-                </button>
-              </div>
-            </div>
+          <div className="flex items-center justify-between px-1">
+            <h2 className="text-[14px] font-medium tracking-tight text-stone-500 flex items-center gap-2">
+              <Folder className="w-4 h-4 text-stone-400" />
+              Active Projects
+            </h2>
             <span className="text-[12px] text-stone-400 font-medium">COUNT {projects.length}</span>
           </div>
 
@@ -314,13 +268,7 @@ export default function Dashboard() {
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {(projectTab === 'all' ? projects : [...projects].sort((a, b) => {
-                const aLogs = logs.filter(l => l.projectId === a.id);
-                const bLogs = logs.filter(l => l.projectId === b.id);
-                const aLast = aLogs.length ? Math.max(...aLogs.map(l => new Date(l.createdAt).getTime())) : new Date(a.createdAt).getTime();
-                const bLast = bLogs.length ? Math.max(...bLogs.map(l => new Date(l.createdAt).getTime())) : new Date(b.createdAt).getTime();
-                return bLast - aLast;
-              }).slice(0, 3)).map((project) => {
+              {projects.map((project) => {
                 const projectTasks = tasks.filter(t => t.projectId === project.id);
                 const progress = projectTasks.length ? Math.round((projectTasks.filter(t => t.status === 'done').length / projectTasks.length) * 100) : 0;
                 
@@ -369,17 +317,15 @@ export default function Dashboard() {
                   {activeTasks.slice(0, 6).map(task => {
                     const project = projects.find(p => p.id === task.projectId);
                     return (
-                      <Link key={task.id} href={`/projects/${task.projectId}`} className="block">
-                        <div className="flex gap-3 items-start group p-2 -mx-2 hover:bg-stone-50 rounded-lg transition-colors cursor-pointer">
-                          <div className="mt-0.5">
-                            <Circle className="w-4 h-4 text-stone-300 group-hover:text-stone-500 transition-colors" />
-                          </div>
-                          <div>
-                            <p className="text-sm font-medium text-stone-800 leading-tight group-hover:text-stone-900 transition-colors">{task.title}</p>
-                            {project && <p className="text-[10px] uppercase tracking-wider text-stone-400 mt-1 font-semibold">{project.name}</p>}
-                          </div>
+                      <div key={task.id} className="flex gap-3 items-start group">
+                        <div className="mt-0.5">
+                          <Circle className="w-4 h-4 text-stone-300 group-hover:text-stone-400 transition-colors" />
                         </div>
-                      </Link>
+                        <div>
+                          <p className="text-sm font-medium text-stone-800 leading-tight">{task.title}</p>
+                          {project && <p className="text-[10px] uppercase tracking-wider text-stone-400 mt-0.5 font-semibold">{project.name}</p>}
+                        </div>
+                      </div>
                     );
                   })}
                 </div>

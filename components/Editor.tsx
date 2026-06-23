@@ -17,7 +17,7 @@ export default function Editor({
   readOnly = false
 }: { 
   initialContent: string; 
-  onChange?: (content: string) => void;
+  onChange?: (html: string) => void;
   readOnly?: boolean;
 }) {
   const [linkInputOpen, setLinkInputOpen] = useState(false);
@@ -65,8 +65,8 @@ export default function Editor({
               if (url) {
                 const { schema } = view.state;
                 const coordinates = view.posAtCoords({ left: event.clientX, top: event.clientY });
+                const node = schema.nodes.image.create({ src: url });
                 if (coordinates) {
-                  const node = schema.nodes.image.create({ src: url });
                   const transaction = view.state.tr.insert(coordinates.pos, node);
                   view.dispatch(transaction);
                 }
@@ -82,16 +82,10 @@ export default function Editor({
 
   // Keep editor content in sync if readOnly updates (important for client view mode)
   useEffect(() => {
-    if (editor && initialContent !== editor.getHTML()) {
-      // Don't update if it's JSON from blocknote, just try to render as text
-      if (initialContent.startsWith('[')) {
-          // It's blocknote JSON. Tiptap will crash if we try setContent with it.
-          // In real migration we'd parse this, but for now we fallback.
-      } else {
-          editor.commands.setContent(initialContent);
-      }
+    if (readOnly && editor && initialContent !== editor.getHTML()) {
+      editor.commands.setContent(initialContent);
     }
-  }, [initialContent, editor]);
+  }, [initialContent, readOnly, editor]);
 
   const toggleLinkInput = () => {
     if (!editor) return;
@@ -127,15 +121,15 @@ export default function Editor({
   }
 
   return (
-    <div className={`border rounded-lg overflow-visible bg-white dark:bg-stone-950 ${readOnly ? 'border-transparent' : 'border-zinc-200 dark:border-stone-800 shadow-sm'} relative`}>
+    <div className={`border rounded-lg overflow-visible bg-white ${readOnly ? 'border-transparent' : 'border-zinc-200 shadow-sm'} relative`}>
       {!readOnly && (
-        <div className="flex flex-wrap items-center gap-1 p-2 border-b border-zinc-100 dark:border-stone-800 bg-zinc-50/50 dark:bg-stone-900/50">
+        <div className="flex flex-wrap items-center gap-1 p-2 border-b border-zinc-100 bg-zinc-50/50">
           <Button
             type="button"
             variant="ghost"
             size="sm"
             onClick={() => editor.chain().focus().toggleBold().run()}
-            className={editor.isActive('bold') ? 'bg-zinc-200 dark:bg-stone-800' : ''}
+            className={editor.isActive('bold') ? 'bg-zinc-200' : ''}
           >
             <Bold className="w-4 h-4" />
           </Button>
@@ -144,17 +138,17 @@ export default function Editor({
             variant="ghost"
             size="sm"
             onClick={() => editor.chain().focus().toggleItalic().run()}
-            className={editor.isActive('italic') ? 'bg-zinc-200 dark:bg-stone-800' : ''}
+            className={editor.isActive('italic') ? 'bg-zinc-200' : ''}
           >
             <Italic className="w-4 h-4" />
           </Button>
-          <div className="w-px h-4 bg-zinc-300 dark:bg-stone-700 mx-1" />
+          <div className="w-px h-4 bg-zinc-300 mx-1" />
           <Button
             type="button"
             variant="ghost"
             size="sm"
             onClick={() => editor.chain().focus().toggleBulletList().run()}
-            className={editor.isActive('bulletList') ? 'bg-zinc-200 dark:bg-stone-800' : ''}
+            className={editor.isActive('bulletList') ? 'bg-zinc-200' : ''}
           >
             <List className="w-4 h-4" />
           </Button>
@@ -163,10 +157,63 @@ export default function Editor({
             variant="ghost"
             size="sm"
             onClick={() => editor.chain().focus().toggleOrderedList().run()}
-            className={editor.isActive('orderedList') ? 'bg-zinc-200 dark:bg-stone-800' : ''}
+            className={editor.isActive('orderedList') ? 'bg-zinc-200' : ''}
           >
             <ListOrdered className="w-4 h-4" />
           </Button>
+          <div className="w-px h-4 bg-zinc-300 mx-1" />
+          <div className="relative">
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={toggleLinkInput}
+              className={editor.isActive('link') ? 'bg-zinc-200' : ''}
+            >
+              <Link2 className="w-4 h-4" />
+            </Button>
+            {linkInputOpen && (
+              <div className="absolute top-full left-0 mt-1 p-2 bg-white border border-stone-200 rounded shadow-lg z-50 flex gap-2">
+                <input 
+                  type="url" 
+                  autoFocus
+                  placeholder="https://..." 
+                  value={linkUrl} 
+                  onChange={(e) => setLinkUrl(e.target.value)} 
+                  className="text-sm border border-stone-200 rounded px-2 py-1 w-48"
+                  onKeyDown={(e) => e.key === 'Enter' && applyLink()}
+                />
+                <Button size="sm" onClick={applyLink}>Add</Button>
+              </div>
+            )}
+          </div>
+          <div className="relative">
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={() => { setImageInputOpen(!imageInputOpen); setLinkInputOpen(false); }}
+            >
+              <ImageIcon className="w-4 h-4" />
+            </Button>
+            {imageInputOpen && (
+              <div className="absolute top-full left-0 mt-1 p-2 bg-white border border-stone-200 rounded shadow-lg z-50 flex flex-col gap-2 w-64">
+                <span className="text-xs text-stone-500 font-medium">Add Image via URL (or drop file below):</span>
+                <div className="flex gap-2">
+                  <input 
+                    type="url" 
+                    autoFocus
+                    placeholder="https://picsum..." 
+                    value={imageUrl} 
+                    onChange={(e) => setImageUrl(e.target.value)} 
+                    className="text-sm border border-stone-200 rounded px-2 py-1 flex-1"
+                    onKeyDown={(e) => e.key === 'Enter' && applyImage()}
+                  />
+                  <Button size="sm" onClick={applyImage}>Add</Button>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       )}
       <div className={`p-4 ${readOnly ? 'p-0 pb-10' : ''}`}>

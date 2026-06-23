@@ -3,15 +3,6 @@ import { persist } from 'zustand/middleware';
 import { Identity, Project, Task, Log, Asset, Note, Invoice, Resource } from '@/types';
 import * as api from './api';
 
-export interface PartialTemplate {
-  id: string;
-  name: string;
-  description: string;
-  canvasTemplate: string;
-  defaultTasks?: { title: string; stage: string }[];
-  defaultResources?: { title: string; url: string; category: string }[];
-}
-
 interface AgencyState {
   sidebarOpen: boolean;
   identity: Identity | null;
@@ -22,12 +13,9 @@ interface AgencyState {
   notes: Note[];
   invoices: Invoice[];
   resources: Resource[];
-  customTemplates: PartialTemplate[];
   
   toggleSidebar: () => void;
   setIdentity: (identity: Identity) => void;
-  addCustomTemplate: (template: PartialTemplate) => void;
-  removeCustomTemplate: (id: string) => void;
 
   
   // Projects
@@ -51,7 +39,6 @@ interface AgencyState {
   // Invoices
   addInvoice: (invoice: Omit<Invoice, 'id' | 'createdAt'>) => Promise<void>;
   updateInvoice: (id: string, updates: Partial<Invoice>) => Promise<void>;
-  deleteInvoice: (id: string) => Promise<void>;
 
   // Resources
   addResource: (resource: Omit<Resource, 'id' | 'createdAt'>) => Promise<void>;
@@ -74,19 +61,10 @@ export const useStore = create<AgencyState>()(
       notes: [],
       invoices: [],
       resources: [],
-      customTemplates: [],
 
       toggleSidebar: () => set((state) => ({ sidebarOpen: !state.sidebarOpen })),
 
       setIdentity: (identity) => set({ identity }),
-
-      addCustomTemplate: (template) => set((state) => ({
-        customTemplates: [...state.customTemplates, template]
-      })),
-
-      removeCustomTemplate: (id) => set((state) => ({
-        customTemplates: state.customTemplates.filter(t => t.id !== id)
-      })),
 
       addProject: async (projectData) => {
         const { identity } = get();
@@ -236,11 +214,6 @@ export const useStore = create<AgencyState>()(
         }));
         const updated = get().invoices.find(i => i.id === id);
         if (updated) await api.syncInvoice(updated);
-      },
-
-      deleteInvoice: async (id) => {
-        await api.deleteInvoiceApi(id);
-        set((state) => ({ invoices: state.invoices.filter(i => i.id !== id) }));
       },
 
       addResource: async (resourceData) => {

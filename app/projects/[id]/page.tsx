@@ -4,7 +4,7 @@ import { useStore } from '@/lib/store';
 import { useParams, useRouter } from 'next/navigation';
 import { useState, use, useEffect } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, CheckCircle2, Circle, Clock, MoreVertical, Eye, FileImage, Trash2, Link2, ExternalLink, Plus } from 'lucide-react';
+import { ArrowLeft, CheckCircle2, Circle, Clock, MoreVertical, Eye, FileImage, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Editor from '@/components/Editor';
 import { TaskStage, TaskStatus } from '@/types';
@@ -13,63 +13,19 @@ import { toast } from 'sonner';
 export default function ProjectDetail() {
   const { id } = useParams() as { id: string };
   const router = useRouter();
-  const { projects, tasks, addTask, updateTask, updateProjectCanvas, addAsset, assets, deleteProject, resources, addResource, deleteResource, addCustomTemplate } = useStore();
+  const { projects, tasks, addTask, updateTask, updateProjectCanvas, addAsset, assets, deleteProject } = useStore();
   const [mounted, setMounted] = useState(false);
-  const [isClientView, setIsClientView] = useState(false);
   
   const project = projects.find(p => p.id === id);
   const projectTasks = tasks.filter(t => t.projectId === id);
   const projectAssets = assets.filter(a => a.projectId === id);
-  const projectResources = resources.filter(r => r.projectId === id);
 
   const [newTaskTitle, setNewTaskTitle] = useState('');
-  const [activeTab, setActiveTab] = useState<'canvas' | 'board' | 'assets' | 'resources'>('canvas');
+  const [activeTab, setActiveTab] = useState<'canvas' | 'board' | 'assets'>('canvas');
   const [isStatusMenuOpen, setIsStatusMenuOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const [isCreatingResource, setIsCreatingResource] = useState(false);
-  const [newResource, setNewResource] = useState({ title: '', url: '', category: '' });
-
-  const categories = Array.from(new Set(projectResources.map(r => r.category).filter(Boolean)));
-  if (!categories.includes('Uncategorized')) {
-    categories.push('Uncategorized');
-  }
-
-  const handleAddResource = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newResource.title || !newResource.url) return;
-    
-    addResource({
-      title: newResource.title,
-      url: newResource.url,
-      category: newResource.category || 'Uncategorized',
-      projectId: id
-    });
-    setNewResource({ title: '', url: '', category: '' });
-    setIsCreatingResource(false);
-  };
-
-  const handleSaveAsTemplate = () => {
-    if (!project) return;
-    addCustomTemplate({
-      // eslint-disable-next-line react-hooks/purity
-      id: `custom-tpl-${Date.now()}`,
-      name: `${project.name} Template`,
-      description: `Extracted from ${project.name}`,
-      canvasTemplate: project.canvasContent,
-      defaultTasks: projectTasks.map(t => ({ title: t.title, stage: t.stage })),
-      defaultResources: projectResources.map(r => ({ title: r.title, url: r.url, category: r.category }))
-    });
-    toast.success('Project saved as a custom reusable template.');
-  };
 
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const urlParams = new URLSearchParams(window.location.search);
-      if (urlParams.get('client-view') === 'true') {
-        // eslint-disable-next-line react-hooks/set-state-in-effect
-        setIsClientView(true);
-      }
-    }
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);
   }, []);
@@ -154,59 +110,49 @@ export default function ProjectDetail() {
         </div>
         
         <div className="flex items-center gap-3">
-          {!isClientView && (
-            <>
-              <Button 
-                variant="ghost" 
-                size="icon" 
-                className="text-stone-400 hover:text-red-600 hover:bg-red-50"
-                onClick={() => setIsDeleteDialogOpen(true)}
-              >
-                <Trash2 className="w-4 h-4" />
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                className="border-stone-200 text-stone-600 hover:bg-stone-100"
-                onClick={handleSaveAsTemplate}
-              >
-                Save as Template
-              </Button>
-              <Button 
-                variant="outline" 
-                size="sm" 
-                className="border-stone-200 text-stone-600 hover:bg-stone-100"
-                onClick={async () => {
-                  const completedTasks = projectTasks.filter(t => t.status === 'done');
-                  const pendingTasks = projectTasks.filter(t => t.status !== 'done');
-                  const report = `Project Update: ${project.name}
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            className="text-stone-400 hover:text-red-600 hover:bg-red-50"
+            onClick={() => setIsDeleteDialogOpen(true)}
+          >
+            <Trash2 className="w-4 h-4" />
+          </Button>
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="border-stone-200 text-stone-600 hover:bg-stone-100"
+            onClick={async () => {
+              const completedTasks = projectTasks.filter(t => t.status === 'done');
+              const pendingTasks = projectTasks.filter(t => t.status !== 'done');
+              const report = `Project Update: ${project.name}
 Client: ${project.client}
 Status: ${project.status.toUpperCase()}
 
 COMPLETED RECENTLY:
-${completedTasks.length > 0 ? completedTasks.map(t => '✓ ' + t.title).join('\n') : 'No completed tasks yet.'}
+${completedTasks.length > 0 ? completedTasks.map(t => '✓ ' + t.title).join('\\n') : 'No completed tasks yet.'}
 
 UPCOMING:
-${pendingTasks.length > 0 ? pendingTasks.slice(0, 5).map(t => '☐ ' + t.title).join('\n') : 'No pending tasks.'}
+${pendingTasks.length > 0 ? pendingTasks.slice(0, 5).map(t => '☐ ' + t.title).join('\\n') : 'No pending tasks.'}
 
 Please let me know if you have any questions!`;
 
-                  await navigator.clipboard.writeText(report);
-                  toast.success('Status Report copied to clipboard.');
-                }}
-              >
-                Copy Status Report
-              </Button>
-              <Button 
-                variant="default" 
-                size="sm" 
-                className="bg-stone-900 text-white hover:bg-stone-800"
-                onClick={() => {
-                  const url = window.location.origin;
-                  const subject = `Project Update: ${project.name}`;
-                  const completedTasks = projectTasks.filter(t => t.status === 'done');
-                  const pendingTasks = projectTasks.filter(t => t.status !== 'done');
-                  const body = `Hi ${project.client},
+              await navigator.clipboard.writeText(report);
+              toast.success('Status Report copied to clipboard.');
+            }}
+          >
+            Copy Status Report
+          </Button>
+          <Button 
+            variant="default" 
+            size="sm" 
+            className="bg-stone-900 text-white hover:bg-stone-800"
+            onClick={() => {
+              const url = window.location.origin;
+              const subject = `Project Update: ${project.name}`;
+              const completedTasks = projectTasks.filter(t => t.status === 'done');
+              const pendingTasks = projectTasks.filter(t => t.status !== 'done');
+              const body = `Hi ${project.client},
 
 Here is the latest update for your project:
 
@@ -220,20 +166,18 @@ ${pendingTasks.length > 0 ? pendingTasks.slice(0, 5).map(t => '☐ ' + t.title).
 
 Best,
 Your Agency`;
-                  window.location.assign(`mailto:?subject=${encodeURIComponent(subject)}&body=${body}`);
-                }}
-              >
-                Draft Email Update
-              </Button>
-            </>
-          )}
+              window.location.assign(`mailto:?subject=${encodeURIComponent(subject)}&body=${body}`);
+            }}
+          >
+            Draft Email Update
+          </Button>
         </div>
       </header>
 
       {/* Tabs */}
       <div className="px-8 border-b border-[#EFEFEF] bg-white shrink-0">
         <nav className="flex gap-6">
-          {(['canvas', 'board', 'assets', 'resources'] as const).map(tab => (
+          {(['canvas', 'board', 'assets'] as const).map(tab => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
@@ -258,7 +202,6 @@ Your Agency`;
                 <Editor 
                   initialContent={project.canvasContent || ''} 
                   onChange={(html) => updateProjectCanvas(project.id, html)} 
-                  readOnly={isClientView}
                 />
               </div>
             </div>
@@ -279,22 +222,16 @@ Your Agency`;
                     <div className="space-y-2.5">
                       {stageTasks.map(task => (
                         <div key={task.id} className="bg-white p-3 rounded-lg shadow-[0_1px_2px_rgba(0,0,0,0.05)] border border-stone-200/60 flex items-start gap-2 group">
-                          {isClientView ? (
-                            <div className="mt-[3px] text-stone-300">
-                              {task.status === 'done' ? <CheckCircle2 className="w-[18px] h-[18px] text-stone-900" /> : <Circle className="w-[18px] h-[18px]" />}
-                            </div>
-                          ) : (
-                            <button 
-                              className="mt-[3px] text-stone-300 group-hover:text-stone-500 transition-colors"
-                              onClick={() => toggleTaskStatus(task.id, task.status)}
-                            >
-                              {task.status === 'done' ? (
-                                <CheckCircle2 className="w-[18px] h-[18px] text-stone-900" />
-                              ) : (
-                                <Circle className="w-[18px] h-[18px]" />
-                              )}
-                            </button>
-                          )}
+                          <button 
+                            className="mt-[3px] text-stone-300 group-hover:text-stone-500 transition-colors"
+                            onClick={() => toggleTaskStatus(task.id, task.status)}
+                          >
+                            {task.status === 'done' ? (
+                              <CheckCircle2 className="w-[18px] h-[18px] text-stone-900" />
+                            ) : (
+                              <Circle className="w-[18px] h-[18px]" />
+                            )}
+                          </button>
                           <div className="flex-1">
                             <p className={`text-[13px] font-medium leading-normal ${task.status === 'done' ? 'line-through text-stone-400' : 'text-stone-800'}`}>
                               {task.title}
@@ -303,19 +240,17 @@ Your Agency`;
                         </div>
                       ))}
 
-                      {!isClientView && (
-                        <form 
-                          onSubmit={(e) => handleAddTask(e, stage.id)}
-                          className="mt-2"
-                        >
-                          <input 
-                            type="text" 
-                            name="title"
-                            placeholder="Add a task..." 
-                            className="w-full bg-white text-[13px] border border-stone-200/60 rounded-lg px-3 py-2.5 focus:outline-none focus:ring-1 focus:ring-stone-400 focus:border-stone-400 shadow-sm transition-all text-stone-700 placeholder:text-stone-400"
-                          />
-                        </form>
-                      )}
+                      <form 
+                        onSubmit={(e) => handleAddTask(e, stage.id)}
+                        className="mt-2"
+                      >
+                        <input 
+                          type="text" 
+                          name="title"
+                          placeholder="Add a task..." 
+                          className="w-full bg-white text-[13px] border border-stone-200/60 rounded-lg px-3 py-2.5 focus:outline-none focus:ring-1 focus:ring-stone-400 focus:border-stone-400 shadow-sm transition-all text-stone-700 placeholder:text-stone-400"
+                        />
+                      </form>
                     </div>
                   </div>
                 );
@@ -331,32 +266,30 @@ Your Agency`;
                   <h3 className="font-semibold text-stone-900 text-base mb-1">Files & Media</h3>
                   <p className="text-sm text-stone-500">Click on any asset to insert it directly into the canvas.</p>
                 </div>
-                {!isClientView && (
-                  <div className="flex gap-4">
-                    <div className="relative">
-                      <input 
-                        type="file" 
-                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                        accept="image/*"
-                        onChange={async (e) => {
-                          const file = e.target.files?.[0];
-                          if (file) {
-                            try {
-                              const { uploadToCloudinary } = await import('@/lib/api');
-                              const url = await uploadToCloudinary(file);
-                              await addAsset(project.id, url, 'image');
-                            } catch (err: any) {
-                              alert(err.message || 'Upload failed');
-                            }
+                <div className="flex gap-4">
+                  <div className="relative">
+                    <input 
+                      type="file" 
+                      className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                      accept="image/*"
+                      onChange={async (e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          try {
+                            const { uploadToCloudinary } = await import('@/lib/api');
+                            const url = await uploadToCloudinary(file);
+                            await addAsset(project.id, url, 'image');
+                          } catch (err: any) {
+                            alert(err.message || 'Upload failed');
                           }
-                        }}
-                      />
-                      <Button variant="outline" className="border-stone-200 shadow-sm text-stone-700 hover:bg-stone-50">
-                        Upload File
-                      </Button>
-                    </div>
+                        }
+                      }}
+                    />
+                    <Button variant="outline" className="border-stone-200 shadow-sm text-stone-700 hover:bg-stone-50">
+                      Upload File
+                    </Button>
                   </div>
-                )}
+                </div>
               </div>
 
               {assets.length === 0 ? (
@@ -395,104 +328,16 @@ Your Agency`;
             </div>
           )}
 
-          {/* Resources View */}
-          {activeTab === 'resources' && (
-            <div className="space-y-8">
-              <div className="flex justify-between items-center bg-white p-6 rounded-2xl border border-dashed border-stone-300">
-                <div>
-                  <h3 className="font-semibold text-stone-900 text-base mb-1">Resource Library</h3>
-                  <p className="text-sm text-stone-500">Links, documents, and reference materials for this project.</p>
-                </div>
-                {!isClientView && (
-                  <Button onClick={() => setIsCreatingResource(!isCreatingResource)} variant="outline" className="border-stone-200 shadow-sm text-stone-700 hover:bg-stone-50">
-                    <Plus className="w-4 h-4 mr-2" /> Add Link
-                  </Button>
-                )}
-              </div>
-
-              {isCreatingResource && (
-                <section className="bg-white border border-stone-200 rounded-xl p-8 shadow-sm">
-                  <h3 className="font-sans text-xl font-semibold text-stone-800 mb-6">New Resource Link</h3>
-                  <form onSubmit={handleAddResource} className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div className="space-y-2">
-                      <label className="text-xs font-semibold uppercase tracking-wider text-stone-500">Title</label>
-                      <input required type="text" placeholder="Brand Guidelines PDF" className="w-full border border-stone-200 rounded-md h-10 px-3 text-sm focus:ring-1 focus:ring-stone-400 focus:outline-none" value={newResource.title} onChange={e => setNewResource({...newResource, title: e.target.value})} />
-                    </div>
-                    <div className="space-y-2">
-                      <label className="text-xs font-semibold uppercase tracking-wider text-stone-500">URL</label>
-                      <input required type="url" placeholder="https://..." className="w-full border border-stone-200 rounded-md h-10 px-3 text-sm focus:ring-1 focus:ring-stone-400 focus:outline-none" value={newResource.url} onChange={e => setNewResource({...newResource, url: e.target.value})} />
-                    </div>
-                    <div className="space-y-2">
-                      <label className="text-xs font-semibold uppercase tracking-wider text-stone-500">Category</label>
-                      <input type="text" list="categories-list" placeholder="Design, Strategy, etc." className="w-full border border-stone-200 rounded-md h-10 px-3 text-sm focus:ring-1 focus:ring-stone-400 focus:outline-none" value={newResource.category} onChange={e => setNewResource({...newResource, category: e.target.value})} />
-                      <datalist id="categories-list">
-                        {categories.map(c => <option key={c} value={c} />)}
-                      </datalist>
-                    </div>
-                    <div className="md:col-span-3 flex gap-3 pt-2">
-                      <Button type="submit" size="sm" className="bg-stone-900 hover:bg-stone-800 text-white border-none transition-colors">Save Resource</Button>
-                      <Button type="button" size="sm" variant="outline" onClick={() => setIsCreatingResource(false)}>Cancel</Button>
-                    </div>
-                  </form>
-                </section>
-              )}
-
-              {projectResources.length === 0 ? (
-                <div className="text-center py-24 bg-white/50 rounded-3xl border border-dashed border-stone-200">
-                  <Link2 className="w-10 h-10 text-stone-300 mx-auto mb-4" />
-                  <p className="text-stone-500 font-medium">No resources available. Add a link to get started.</p>
-                </div>
-              ) : (
-                <div className="space-y-8">
-                  {categories.map(category => {
-                    const catResources = projectResources.filter(r => (r.category || 'Uncategorized') === category);
-                    if (catResources.length === 0) return null;
-                    return (
-                      <div key={category} className="space-y-4">
-                        <h2 className="text-sm font-bold tracking-widest uppercase text-stone-400 px-1 border-b border-stone-200 pb-2">{category}</h2>
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                          {catResources.map(resource => (
-                            <div key={resource.id} className="bg-white border border-stone-200 rounded-xl p-5 shadow-sm hover:shadow-md transition-all group flex flex-col">
-                              <div className="flex items-start justify-between mb-2">
-                                <div className="p-2 bg-stone-50 rounded text-stone-500 border border-stone-100 group-hover:bg-stone-100 transition-colors">
-                                  <Link2 className="w-4 h-4" />
-                                </div>
-                                <div className="flex gap-1">
-                                  <a href={resource.url} target="_blank" rel="noopener noreferrer" className="p-1.5 text-stone-400 hover:text-stone-900 hover:bg-stone-50 rounded transition-colors hidden group-hover:block">
-                                    <ExternalLink className="w-3.5 h-3.5" />
-                                  </a>
-                                  <button onClick={() => deleteResource(resource.id)} className="p-1.5 text-stone-400 hover:text-red-500 hover:bg-stone-50 rounded transition-colors hidden group-hover:block">
-                                    <Trash2 className="w-3.5 h-3.5" />
-                                  </button>
-                                </div>
-                              </div>
-                              <h3 className="font-semibold text-stone-800 text-sm mb-1 line-clamp-1">{resource.title}</h3>
-                              <p className="text-xs text-stone-400 font-mono truncate mb-4">{resource.url}</p>
-                              
-                              <div className="mt-auto text-[10px] uppercase font-bold tracking-wider text-stone-400">
-                                {/* Use simple custom date formatter to avoid missing import */}
-                                Added {new Date(resource.createdAt).toLocaleDateString()}
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
-          )}
-
         </div>
       </div>
+
       {isDeleteDialogOpen && (
         <>
           <div className="fixed inset-0 z-[100] bg-stone-900/40 backdrop-blur-sm transition-opacity" onClick={() => setIsDeleteDialogOpen(false)} />
           <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[101] bg-white rounded-xl shadow-xl border border-stone-200/60 p-6 w-[90%] max-w-md animate-in fade-in zoom-in-95 duration-200">
             <h3 className="font-sans text-xl font-bold text-stone-900 mb-2">Delete Project?</h3>
             <p className="text-sm text-stone-500 mb-6 font-medium leading-relaxed">
-              Are you sure you want to delete <span className="font-bold text-stone-700">&quot;{project.name}&quot;</span>? This action cannot be undone and will permanently remove all tasks, assets, and project data.
+              Are you sure you want to delete <span className="font-bold text-stone-700">"{project.name}"</span>? This action cannot be undone and will permanently remove all tasks, assets, and project data.
             </p>
             
             <div className="flex gap-3 justify-end mt-4">

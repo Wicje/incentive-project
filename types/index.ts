@@ -84,7 +84,6 @@ export interface Invoice {
 export interface Resource {
   id: string;
   userId?: string;
-  projectId?: string;
   title: string;
   url: string;
   category: string;
