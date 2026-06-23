@@ -11,7 +11,6 @@ import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 
 import { PROJECT_TEMPLATES, MOODBOARD_TEMPLATES } from '@/lib/templates';
-import { FinanceChart } from '@/components/FinanceChart';
 
 export default function Dashboard() {
   const router = useRouter();
@@ -314,17 +313,6 @@ export default function Dashboard() {
 
         {/* Sidebar Info Columns */}
         <div className="lg:col-span-4 space-y-8">
-
-          {/* Active Tasks list */}
-          <section className="space-y-4">
-            <h2 className="text-[14px] font-medium tracking-tight text-stone-500 px-1 flex items-center gap-2">
-              <FileText className="w-4 h-4 text-stone-400" />
-              Finance Overview
-            </h2>
-            <div className="bg-white border border-[#EFEFEF] rounded-[10px] p-5 shadow-sm">
-              <FinanceChart />
-            </div>
-          </section>
 
           {/* Active Tasks list */}
           <section className="space-y-4">
