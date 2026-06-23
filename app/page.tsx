@@ -117,11 +117,11 @@ export default function Dashboard() {
             { name: 'Resource Library', icon: Activity, color: 'text-stone-700', href: '/resources' },
           ].map((domain, i) => (
             <Link href={domain.href} key={i}>
-              <button className="w-full flex items-center gap-3 p-4 bg-white border border-[#EFEFEF] rounded-[10px] hover:bg-[#F9F9F8] transition-colors shadow-sm text-left group h-full">
-                <div className={`p-2 rounded-md bg-[#F4F4F4] group-hover:bg-white transition-colors border border-transparent group-hover:border-[#EFEFEF] ${domain.color}`}>
+              <button className="w-full flex items-center gap-3 p-4 bg-stone-900 text-white border border-transparent rounded-[10px] hover:bg-stone-800 transition-colors shadow-sm text-left group h-full">
+                <div className={`p-2 rounded-md bg-stone-800/20 text-white transition-colors group-hover:bg-stone-800/40`}>
                   <domain.icon className="w-4 h-4" />
                 </div>
-                <span className="font-medium text-stone-800 text-[14px] tracking-tight">{domain.name}</span>
+                <span className="font-medium text-white text-[14px] tracking-tight">{domain.name}</span>
               </button>
             </Link>
           ))}
