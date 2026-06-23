@@ -39,6 +39,7 @@ interface AgencyState {
   // Invoices
   addInvoice: (invoice: Omit<Invoice, 'id' | 'createdAt'>) => Promise<void>;
   updateInvoice: (id: string, updates: Partial<Invoice>) => Promise<void>;
+  deleteInvoice: (id: string) => Promise<void>;
 
   // Resources
   addResource: (resource: Omit<Resource, 'id' | 'createdAt'>) => Promise<void>;
@@ -214,6 +215,11 @@ export const useStore = create<AgencyState>()(
         }));
         const updated = get().invoices.find(i => i.id === id);
         if (updated) await api.syncInvoice(updated);
+      },
+
+      deleteInvoice: async (id) => {
+        await api.deleteInvoiceApi(id);
+        set((state) => ({ invoices: state.invoices.filter(i => i.id !== id) }));
       },
 
       addResource: async (resourceData) => {

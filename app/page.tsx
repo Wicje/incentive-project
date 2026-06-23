@@ -19,6 +19,7 @@ export default function Dashboard() {
   const [isCreatingTask, setIsCreatingTask] = useState(false);
   const [newTask, setNewTask] = useState({ title: '', projectId: '' });
   const [newProject, setNewProject] = useState({ name: '', client: '', deadline: '', templateId: '' });
+  const [projectTab, setProjectTab] = useState<'recent' | 'all'>('recent');
 
   if (!identity) return null;
 
@@ -253,11 +254,21 @@ export default function Dashboard() {
         
         {/* Active Projects Container */}
         <section className="lg:col-span-8 space-y-4">
-          <div className="flex items-center justify-between px-1">
-            <h2 className="text-[14px] font-medium tracking-tight text-stone-500 flex items-center gap-2">
-              <Folder className="w-4 h-4 text-stone-400" />
-              Active Projects
-            </h2>
+          <div className="flex items-center justify-between px-1 border-b border-stone-200 pb-2">
+            <div className="flex gap-4">
+              <button 
+                onClick={() => setProjectTab('recent')}
+                className={`text-[14px] font-medium tracking-tight flex items-center gap-2 ${projectTab === 'recent' ? 'text-stone-900 dark:text-stone-100 border-b-2 border-stone-900 dark:border-stone-100 pb-2 -mb-[9px]' : 'text-stone-500 hover:text-stone-700 pb-2 -mb-[9px]'}`}
+              >
+                Recent
+              </button>
+              <button 
+                onClick={() => setProjectTab('all')}
+                className={`text-[14px] font-medium tracking-tight flex items-center gap-2 ${projectTab === 'all' ? 'text-stone-900 dark:text-stone-100 border-b-2 border-stone-900 dark:border-stone-100 pb-2 -mb-[9px]' : 'text-stone-500 hover:text-stone-700 pb-2 -mb-[9px]'}`}
+              >
+                All Projects
+              </button>
+            </div>
             <span className="text-[12px] text-stone-400 font-medium">COUNT {projects.length}</span>
           </div>
 
@@ -268,7 +279,7 @@ export default function Dashboard() {
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {projects.map((project) => {
+              {(projectTab === 'recent' ? [...projects].sort((a,b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()).slice(0, 3) : projects).map((project) => {
                 const projectTasks = tasks.filter(t => t.projectId === project.id);
                 const progress = projectTasks.length ? Math.round((projectTasks.filter(t => t.status === 'done').length / projectTasks.length) * 100) : 0;
                 
@@ -322,7 +333,9 @@ export default function Dashboard() {
                           <Circle className="w-4 h-4 text-stone-300 group-hover:text-stone-400 transition-colors" />
                         </div>
                         <div>
-                          <p className="text-sm font-medium text-stone-800 leading-tight">{task.title}</p>
+                          <Link href={`/projects/${task.projectId}`} className="hover:underline">
+                            <p className="text-sm font-medium text-stone-800 dark:text-stone-100 leading-tight">{task.title}</p>
+                          </Link>
                           {project && <p className="text-[10px] uppercase tracking-wider text-stone-400 mt-0.5 font-semibold">{project.name}</p>}
                         </div>
                       </div>

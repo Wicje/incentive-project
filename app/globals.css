@@ -1,6 +1,16 @@
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
 
+@theme {
+  --color-brand-light-60: #e5e5e5;
+  --color-brand-light-30: #f4f4f4;
+  --color-brand-light-10: #2F4560;
+
+  --color-brand-dark-60: #242E3D;
+  --color-brand-dark-30: #37818D;
+  --color-brand-dark-10: #66FFCC;
+}
+
 ul[data-type="taskList"] {
   list-style: none;
   padding: 0;

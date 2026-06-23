@@ -21,9 +21,13 @@ export default function ProjectDetail() {
   const projectAssets = assets.filter(a => a.projectId === id);
 
   const [newTaskTitle, setNewTaskTitle] = useState('');
-  const [activeTab, setActiveTab] = useState<'canvas' | 'board' | 'assets'>('canvas');
+  const [activeTab, setActiveTab] = useState<'canvas' | 'board' | 'assets' | 'resources'>('canvas');
   const [isStatusMenuOpen, setIsStatusMenuOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const { resources, addResource, deleteResource } = useStore();
+  const projectResources = resources.filter(r => r.projectId === id);
+  const [newResource, setNewResource] = useState({ title: '', url: '', category: '' });
+  const [isCreatingResource, setIsCreatingResource] = useState(false);
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -177,7 +181,7 @@ Your Agency`;
       {/* Tabs */}
       <div className="px-8 border-b border-[#EFEFEF] bg-white shrink-0">
         <nav className="flex gap-6">
-          {(['canvas', 'board', 'assets'] as const).map(tab => (
+          {(['canvas', 'board', 'assets', 'resources'] as const).map(tab => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
@@ -292,16 +296,16 @@ Your Agency`;
                 </div>
               </div>
 
-              {assets.length === 0 ? (
+              {projectAssets.length === 0 ? (
                 <div className="text-center py-24 bg-white/50 rounded-3xl border border-dashed border-stone-200">
                   <FileImage className="w-10 h-10 text-stone-300 mx-auto mb-4" />
                   <p className="text-stone-500 font-medium">No assets available. Upload an image to start using it.</p>
                 </div>
               ) : (
                 <div>
-                  <h4 className="text-sm font-semibold tracking-wider uppercase text-stone-400 mb-4 px-1">Global & Project Assets</h4>
+                  <h4 className="text-sm font-semibold tracking-wider uppercase text-stone-400 mb-4 px-1">Project Assets</h4>
                   <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-6">
-                    {assets.map(asset => (
+                    {projectAssets.map(asset => (
                       <div key={asset.id} className="relative group">
                         <button 
                           onClick={() => {
@@ -323,6 +327,83 @@ Your Agency`;
                       </div>
                     ))}
                   </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Resources View */}
+          {activeTab === 'resources' && (
+            <div className="space-y-8">
+              <div className="flex justify-between items-center bg-white p-6 rounded-2xl border border-dashed border-stone-300">
+                <div>
+                  <h3 className="font-semibold text-stone-900 text-base mb-1">Project Resources</h3>
+                  <p className="text-sm text-stone-500">Links and references specific to this project.</p>
+                </div>
+                <Button variant="outline" className="border-stone-200 shadow-sm text-stone-700 hover:bg-stone-50" onClick={() => setIsCreatingResource(!isCreatingResource)}>
+                  Add Resource
+                </Button>
+              </div>
+
+              {isCreatingResource && (
+                <section className="bg-white border border-stone-200 rounded-xl p-8 shadow-sm">
+                  <h3 className="font-serif text-xl font-semibold text-stone-800 mb-6">New Resource Link</h3>
+                  <form onSubmit={(e) => {
+                    e.preventDefault();
+                    if (!newResource.title || !newResource.url) return;
+                    addResource({
+                      projectId: project.id,
+                      title: newResource.title,
+                      url: newResource.url,
+                      category: newResource.category || 'General'
+                    });
+                    setNewResource({ title: '', url: '', category: '' });
+                    setIsCreatingResource(false);
+                  }} className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="space-y-2">
+                      <label className="text-xs font-semibold uppercase tracking-wider text-stone-500">Title</label>
+                      <input required type="text" placeholder="Figma File" className="w-full border border-stone-200 rounded-md h-10 px-3 text-sm focus:ring-1 focus:ring-stone-400 focus:outline-none" value={newResource.title} onChange={e => setNewResource({...newResource, title: e.target.value})} />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-xs font-semibold uppercase tracking-wider text-stone-500">URL</label>
+                      <input required type="url" placeholder="https://..." className="w-full border border-stone-200 rounded-md h-10 px-3 text-sm focus:ring-1 focus:ring-stone-400 focus:outline-none" value={newResource.url} onChange={e => setNewResource({...newResource, url: e.target.value})} />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-xs font-semibold uppercase tracking-wider text-stone-500">Category</label>
+                      <input type="text" placeholder="Design, Strategy, etc." className="w-full border border-stone-200 rounded-md h-10 px-3 text-sm focus:ring-1 focus:ring-stone-400 focus:outline-none" value={newResource.category} onChange={e => setNewResource({...newResource, category: e.target.value})} />
+                    </div>
+                    <div className="md:col-span-3 flex gap-3 pt-2">
+                      <Button type="submit" size="sm" className="bg-stone-900 text-white border-none">Save Resource</Button>
+                      <Button type="button" size="sm" variant="outline" onClick={() => setIsCreatingResource(false)}>Cancel</Button>
+                    </div>
+                  </form>
+                </section>
+              )}
+
+              {projectResources.length === 0 ? (
+                <div className="text-center py-24 bg-white/50 rounded-3xl border border-dashed border-stone-200">
+                  <p className="text-stone-500 font-medium">No resources added yet.</p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {projectResources.map(resource => (
+                    <div key={resource.id} className="bg-white border border-stone-200 rounded-xl p-5 shadow-sm hover:shadow-md transition-all group flex flex-col">
+                      <div className="flex items-start justify-between mb-2">
+                        <div className="flex gap-1">
+                          <a href={resource.url} target="_blank" rel="noopener noreferrer" className="p-1.5 text-stone-400 hover:text-stone-900 hover:bg-stone-50 rounded transition-colors">
+                            {resource.title}
+                          </a>
+                        </div>
+                        <button onClick={() => deleteResource(resource.id)} className="p-1.5 text-stone-400 hover:text-red-500 hover:bg-stone-50 rounded transition-colors hidden group-hover:block">
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                      <p className="text-xs text-stone-400 font-mono truncate mb-4">{resource.url}</p>
+                      <div className="mt-auto text-[10px] uppercase font-bold tracking-wider text-stone-400">
+                        {resource.category || 'General'}
+                      </div>
+                    </div>
+                  ))}
                 </div>
               )}
             </div>

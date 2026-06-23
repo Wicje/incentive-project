@@ -3,6 +3,7 @@ import { Inter, JetBrains_Mono, Space_Grotesk } from 'next/font/google';
 import './globals.css';
 import IdentityModal from '@/components/IdentityModal';
 import ClientLayout from '@/components/ClientLayout';
+import { ThemeProvider } from '@/components/ThemeProvider';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -28,13 +29,15 @@ import { Toaster } from 'sonner';
 
 export default function RootLayout({children}: {children: React.ReactNode}) {
   return (
-    <html lang="en" className={`${inter.variable} ${jetbrainsMono.variable} ${spaceGrotesk.variable}`}>
-      <body className="bg-white text-stone-900 font-sans antialiased flex h-screen overflow-hidden" suppressHydrationWarning>
-        <ClientLayout>
-          <IdentityModal />
-          {children}
-        </ClientLayout>
-        <Toaster position="bottom-right" richColors />
+    <html lang="en" suppressHydrationWarning className={`${inter.variable} ${jetbrainsMono.variable} ${spaceGrotesk.variable}`}>
+      <body className="font-sans antialiased flex h-screen overflow-hidden bg-background text-foreground bg-[#e5e5e5] dark:bg-[#242E3D]" suppressHydrationWarning>
+        <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
+          <ClientLayout>
+            <IdentityModal />
+            {children}
+          </ClientLayout>
+          <Toaster position="bottom-right" richColors />
+        </ThemeProvider>
       </body>
     </html>
   );

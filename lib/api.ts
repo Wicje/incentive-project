@@ -107,6 +107,14 @@ export async function syncInvoice(invoice: Invoice) {
   }
 }
 
+export async function deleteInvoiceApi(id: string) {
+  try {
+    await deleteDoc(doc(db, 'invoices', id));
+  } catch (err) {
+    console.error('Failed to delete invoice from Firebase:', err);
+  }
+}
+
 export async function syncResource(resource: Resource) {
   try {
     await setDoc(doc(db, 'resources', resource.id), resource);

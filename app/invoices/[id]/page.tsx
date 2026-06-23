@@ -30,8 +30,8 @@ export default function InvoicePage() {
     setIsSending(true);
     try {
       const subject = `Invoice ${invoiceIdStr} from ${identity?.name || 'Agency'}`;
-      const body = `Hi ${invoice.clientName},\n\nPlease find your invoice ${invoiceIdStr} linked here for the amount of $${invoice.amount.toFixed(2)}.\n\nThank you,\n${identity?.name || 'Agency'}`;
-      
+      const body = `Hi ${invoice.clientName},\n\nPlease find your invoice ${invoiceIdStr} linked here for the amount of ₦${invoice.amount.toFixed(2)}.\n\nThank you,\n${identity?.name || 'Agency'}`;
+
       const res = await fetch('/api/send', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -135,31 +135,31 @@ export default function InvoicePage() {
                 <div key={item.id} className="grid grid-cols-12 border-b border-[#3A1F1B]/10 py-5 text-sm font-medium">
                   <div className="col-span-6">{item.description}</div>
                   <div className="col-span-2 text-right font-mono text-[#3A1F1B]/70">{item.quantity}</div>
-                  <div className="col-span-2 text-right font-mono text-[#3A1F1B]/70">${item.rate.toFixed(2)}</div>
-                  <div className="col-span-2 text-right font-semibold">${(item.quantity * item.rate).toFixed(2)}</div>
+                  <div className="col-span-2 text-right font-mono text-[#3A1F1B]/70">₦{item.rate.toFixed(2)}</div>
+                  <div className="col-span-2 text-right font-semibold">₦{(item.quantity * item.rate).toFixed(2)}</div>
                 </div>
               ))
             ) : (
               <div className="grid grid-cols-12 border-b border-[#3A1F1B]/10 py-5 text-sm font-medium">
                 <div className="col-span-6">General Services</div>
                 <div className="col-span-2 text-right font-mono text-[#3A1F1B]/70">1</div>
-                <div className="col-span-2 text-right font-mono text-[#3A1F1B]/70">${subtotal.toFixed(2)}</div>
-                <div className="col-span-2 text-right font-semibold">${subtotal.toFixed(2)}</div>
+                <div className="col-span-2 text-right font-mono text-[#3A1F1B]/70">₦{subtotal.toFixed(2)}</div>
+                <div className="col-span-2 text-right font-semibold">₦{subtotal.toFixed(2)}</div>
               </div>
             )}
 
             <div className="w-1/2 ml-auto mt-6">
               <div className="grid grid-cols-2 py-2 text-sm text-[#3A1F1B]/70">
                 <div className="text-right pr-6">Subtotal</div>
-                <div className="text-right font-mono">${subtotal.toFixed(2)}</div>
+                <div className="text-right font-mono">₦{subtotal.toFixed(2)}</div>
               </div>
               <div className="grid grid-cols-2 py-2 border-b border-[#3A1F1B]/20 text-sm text-[#3A1F1B]/70">
                 <div className="text-right pr-6">Tax (15%)</div>
-                <div className="text-right font-mono">${taxAmount.toFixed(2)}</div>
+                <div className="text-right font-mono">₦{taxAmount.toFixed(2)}</div>
               </div>
               <div className="grid grid-cols-2 py-4 text-lg font-bold">
                 <div className="text-right pr-6">TOTAL</div>
-                <div className="text-right">${total.toFixed(2)}</div>
+                <div className="text-right">₦{total.toFixed(2)}</div>
               </div>
             </div>
           </div>
@@ -189,7 +189,7 @@ export default function InvoicePage() {
           </div>
           <div>
             <div className="text-[10px] font-mono opacity-60 tracking-wider">{invoiceIdStr}</div>
-            <div className="font-bold">${total.toFixed(2)}</div>
+            <div className="font-bold">₦{total.toFixed(2)}</div>
           </div>
         </div>
         
