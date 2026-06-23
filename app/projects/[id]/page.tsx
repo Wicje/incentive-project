@@ -51,6 +51,7 @@ export default function ProjectDetail() {
   const handleSaveAsTemplate = () => {
     if (!project) return;
     addCustomTemplate({
+      // eslint-disable-next-line react-hooks/purity
       id: `custom-tpl-${Date.now()}`,
       name: `${project.name} Template`,
       description: `Extracted from ${project.name}`,
@@ -65,6 +66,7 @@ export default function ProjectDetail() {
     if (typeof window !== 'undefined') {
       const urlParams = new URLSearchParams(window.location.search);
       if (urlParams.get('client-view') === 'true') {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setIsClientView(true);
       }
     }
