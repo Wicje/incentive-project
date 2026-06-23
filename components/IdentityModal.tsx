@@ -15,7 +15,8 @@ export default function IdentityModal() {
   const [error, setError] = useState('');
 
   useEffect(() => {
-    setMounted(true);
+    const timer = setTimeout(() => setMounted(true), 0);
+    return () => clearTimeout(timer);
   }, []);
 
   if (!mounted || identity) return null;

@@ -100,7 +100,7 @@ export default function Dashboard() {
       
       <header className="pt-8 pb-10 flex flex-col items-start justify-center gap-2">
         <h1 className="text-[32px] sm:text-[36px] font-sans font-bold tracking-tight text-stone-900 leading-tight">Good {new Date().getHours() < 12 ? 'morning' : new Date().getHours() < 18 ? 'afternoon' : 'evening'}, {identity.name.split(' ')[0]}</h1>
-        <p className="text-stone-500 font-medium text-[15px]">Here's what's happening in your workspace today.</p>
+        <p className="text-stone-500 font-medium text-[15px]">Here&apos;s what&apos;s happening in your workspace today.</p>
       </header>
 
       {/* Navigation / Domains Bento Grid */}

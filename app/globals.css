@@ -2,19 +2,35 @@
 @plugin "@tailwindcss/typography";
 
 @theme {
-  --color-brand-light-60: #e5e5e5;
-  --color-brand-light-30: #f4f4f4;
-  --color-brand-light-10: #2F4560;
+  --color-brand-60: var(--color-brand-60);
+  --color-brand-30: var(--color-brand-30);
+  --color-brand-10: var(--color-brand-10);
+}
 
-  --color-brand-dark-60: #242E3D;
-  --color-brand-dark-30: #37818D;
-  --color-brand-dark-10: #66FFCC;
+@layer base {
+  :root {
+    --color-brand-60: #e5e5e5;
+    --color-brand-30: #f4f4f4;
+    --color-brand-10: #2F4560;
+  }
+
+  .dark {
+    --color-brand-60: #242E3D;
+    --color-brand-30: #37818D;
+    --color-brand-10: #66FFCC;
+  }
+
+  body {
+    background-color: var(--color-brand-60);
+    color: var(--color-brand-10);
+  }
 }
 
 ul[data-type="taskList"] {
   list-style: none;
   padding: 0;
 }
+
 
 ul[data-type="taskList"] p {
   margin: 0;

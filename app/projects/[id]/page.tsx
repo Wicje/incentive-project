@@ -418,7 +418,7 @@ Your Agency`;
           <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[101] bg-white rounded-xl shadow-xl border border-stone-200/60 p-6 w-[90%] max-w-md animate-in fade-in zoom-in-95 duration-200">
             <h3 className="font-sans text-xl font-bold text-stone-900 mb-2">Delete Project?</h3>
             <p className="text-sm text-stone-500 mb-6 font-medium leading-relaxed">
-              Are you sure you want to delete <span className="font-bold text-stone-700">"{project.name}"</span>? This action cannot be undone and will permanently remove all tasks, assets, and project data.
+              Are you sure you want to delete <span className="font-bold text-stone-700">&quot;{project.name}&quot;</span>? This action cannot be undone and will permanently remove all tasks, assets, and project data.
             </p>
             
             <div className="flex gap-3 justify-end mt-4">
