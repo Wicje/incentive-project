@@ -56,6 +56,13 @@ export default function IdentityModal() {
     setIsAuthenticating(true);
     setError('');
     
+    // Hardcoded fallback for app access without Google OAuth
+    if (password === 'admin123') {
+      setIdentity({ uid: 'fallback-login-uid', name: email.split('@')[0] || 'Admin', email: email });
+      setIsAuthenticating(false);
+      return;
+    }
+
     try {
       if (mode === 'signup') {
         const result = await createUserWithEmailAndPassword(auth, email, password);
@@ -83,6 +90,7 @@ export default function IdentityModal() {
           <div className="mb-6">
             <h2 className="text-2xl font-semibold tracking-tight text-zinc-900 dark:text-stone-100">Welcome to Agency OS</h2>
             <p className="text-zinc-500 dark:text-stone-400 mt-2 text-sm">Please sign in to securely access your workspace.</p>
+            <p className="text-amber-600 dark:text-amber-500 mt-2 text-xs font-medium bg-amber-50 dark:bg-amber-500/10 p-2 rounded w-fit border border-amber-200 dark:border-amber-500/20">Fallback active: Use any email and password <b>admin123</b> to bypass.</p>
           </div>
           
           <div className="space-y-4">
