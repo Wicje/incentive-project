@@ -91,6 +91,7 @@ export default function Dashboard() {
     setNewTask({ title: '', projectId: '' });
     setIsCreatingTask(false);
     toast.success('Task added successfully');
+    router.push(`/projects/${newTask.projectId}`);
   };
 
   const activeTasks = tasks.filter(t => t.status !== 'done');
@@ -117,8 +118,8 @@ export default function Dashboard() {
             { name: 'Resource Library', icon: Activity, color: 'text-stone-700', href: '/resources' },
           ].map((domain, i) => (
             <Link href={domain.href} key={i}>
-              <button className="w-full flex items-center gap-3 p-4 bg-stone-900 text-white border border-transparent rounded-[10px] hover:bg-stone-800 transition-colors shadow-sm text-left group h-full">
-                <div className={`p-2 rounded-md bg-stone-800/20 text-white transition-colors group-hover:bg-stone-800/40`}>
+              <button className="w-full flex items-center gap-3 p-4 bg-stone-900 dark:bg-[#1a212c] text-white border border-transparent rounded-[10px] hover:bg-stone-800 dark:hover:bg-[#141a22] transition-colors shadow-sm text-left group h-full">
+                <div className={`p-2 rounded-md bg-white/10 text-white transition-colors group-hover:bg-white/20`}>
                   <domain.icon className="w-4 h-4" />
                 </div>
                 <span className="font-medium text-white text-[14px] tracking-tight">{domain.name}</span>

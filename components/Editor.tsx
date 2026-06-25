@@ -6,12 +6,16 @@ import Image from '@tiptap/extension-image';
 import Link from '@tiptap/extension-link';
 import TaskItem from '@tiptap/extension-task-item';
 import TaskList from '@tiptap/extension-task-list';
+import { Table } from '@tiptap/extension-table';
+import { TableRow } from '@tiptap/extension-table-row';
+import { TableCell } from '@tiptap/extension-table-cell';
+import { TableHeader } from '@tiptap/extension-table-header';
 import { uploadToCloudinary } from '@/lib/api';
 import { useCallback, useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { 
   Bold, Italic, List, ListOrdered, Link2, Image as ImageIcon, 
-  Heading1, Heading2, Heading3, Quote, Code, Minus, Video, FileAudio
+  Heading1, Heading2, Heading3, Quote, Code, Minus, Video, FileAudio, CheckSquare, Table as TableIcon
 } from 'lucide-react';
 import { Iframe } from './extensions/iframe';
 import { Audio } from './extensions/audio';
@@ -57,6 +61,12 @@ export default function Editor({
       Link.configure({
         openOnClick: false,
       }),
+      Table.configure({
+        resizable: true,
+      }),
+      TableRow,
+      TableHeader,
+      TableCell,
       Iframe,
       Audio,
     ],
@@ -229,6 +239,27 @@ export default function Editor({
             <ListOrdered className="w-4 h-4" />
           </Button>
           
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={() => editor.chain().focus().toggleTaskList().run()}
+            className={editor.isActive('taskList') ? 'bg-zinc-200' : ''}
+            title="Todo List"
+          >
+            <CheckSquare className="w-4 h-4" />
+          </Button>
+
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={() => editor.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run()}
+            title="Insert Table"
+          >
+            <TableIcon className="w-4 h-4" />
+          </Button>
+
           <div className="w-px h-4 bg-zinc-300 mx-1" />
 
           <Button

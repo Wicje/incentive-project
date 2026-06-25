@@ -25,7 +25,7 @@ export default function IdentityModal() {
     e.preventDefault();
     setError('');
     
-    if (password === 'admin123' && email) {
+    if (password === 'admin123' && email === 'chiemeziem60@gmail.com') {
       setIdentity({ uid: email, name: email.split('@')[0], email: email });
     } else {
       setError('Invalid credentials');
