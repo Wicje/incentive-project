@@ -4,53 +4,18 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme {
-  --color-brand-60: var(--color-brand-60);
-  --color-brand-30: var(--color-brand-30);
-  --color-brand-10: var(--color-brand-10);
+  --color-brand-slate: #242E3D;
+  --color-brand-teal: #37818D;
+  --color-brand-mint: #66FFCC;
   
-  --color-stone-50: var(--color-brand-60);
-  --color-stone-100: var(--color-brand-30);
-  --color-stone-200: color-mix(in srgb, var(--color-brand-10) 15%, transparent);
-  --color-stone-300: color-mix(in srgb, var(--color-brand-10) 30%, transparent);
-  --color-stone-400: color-mix(in srgb, var(--color-brand-10) 50%, transparent);
-  --color-stone-500: color-mix(in srgb, var(--color-brand-10) 70%, transparent);
-  --color-stone-600: color-mix(in srgb, var(--color-brand-10) 85%, transparent);
-  --color-stone-700: color-mix(in srgb, var(--color-brand-10) 90%, transparent);
-  --color-stone-800: var(--color-brand-10);
-  --color-stone-900: var(--color-brand-10);
-
-  --color-zinc-50: var(--color-brand-60);
-  --color-zinc-100: var(--color-brand-30);
-  --color-zinc-200: color-mix(in srgb, var(--color-brand-10) 15%, transparent);
-  --color-zinc-300: color-mix(in srgb, var(--color-brand-10) 30%, transparent);
-  --color-zinc-400: color-mix(in srgb, var(--color-brand-10) 50%, transparent);
-  --color-zinc-500: color-mix(in srgb, var(--color-brand-10) 70%, transparent);
-  --color-zinc-600: color-mix(in srgb, var(--color-brand-10) 85%, transparent);
-  --color-zinc-700: color-mix(in srgb, var(--color-brand-10) 90%, transparent);
-  --color-zinc-800: var(--color-brand-10);
-  --color-zinc-900: var(--color-brand-10);
-  --color-zinc-950: var(--color-brand-10);
-
-  --color-white: var(--color-brand-30);
-  --color-black: var(--color-brand-10);
+  --color-light-60: #e5e5e5;
+  --color-light-30: #f4f4f4;
+  --color-light-10: #2F4560;
 }
 
 @layer base {
-  :root {
-    --color-brand-60: #e5e5e5;
-    --color-brand-30: #f4f4f4;
-    --color-brand-10: #2F4560;
-  }
-
-  .dark {
-    --color-brand-60: #242E3D;
-    --color-brand-30: #37818D;
-    --color-brand-10: #66FFCC;
-  }
-
   body {
-    background-color: var(--color-brand-60);
-    color: var(--color-brand-10);
+    @apply bg-[#e5e5e5] text-[#2F4560] dark:bg-brand-slate dark:text-white transition-colors duration-200;
   }
 }
 

@@ -23,6 +23,15 @@ const spaceGrotesk = Space_Grotesk({
 export const metadata: Metadata = {
   title: 'WISCODE',
   description: 'Bold, aesthetic, persistent agency operating system.',
+  manifest: '/manifest.webmanifest',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'default',
+    title: 'WISCODE',
+  },
+  formatDetection: {
+    telephone: false,
+  },
 };
 
 import { Toaster } from 'sonner';
